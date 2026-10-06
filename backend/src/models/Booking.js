@@ -31,7 +31,7 @@ const bookingSchema = new mongoose.Schema(
     cancelledAt: Date,
     cancellationReason: { type: String, trim: true, maxlength: 1000 },
     cancelledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    activeKey: { type: String, sparse: true, select: false },
+    activeKey: { type: String, select: false },
   },
   schemaOptions,
 );

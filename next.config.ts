@@ -9,6 +9,7 @@ const apiUrl = getConfiguredBackendUrl() || LOCAL_BACKEND_URL;
 
 const nextConfig: NextConfig = {
   images: {
+    qualities: [75, 90, 100],
     remotePatterns: [
       {
         protocol: 'https',

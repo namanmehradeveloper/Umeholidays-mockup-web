@@ -176,7 +176,7 @@ async function reserveTourSeats(tourId, travellers) {
       },
     ],
     {
-      new: true,
+      returnDocument: 'after',
       updatePipeline: true,
     }
   );
@@ -232,7 +232,7 @@ async function releaseTourSeats(tourId, travellers) {
       },
     ],
     {
-      new: true,
+      returnDocument: 'after',
       updatePipeline: true,
     }
   );
@@ -495,7 +495,7 @@ export async function cancelBooking(req, res) {
       },
     },
     {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     }
   );
