@@ -36,6 +36,7 @@ type AdminUser = {
   role: Role;
   isActive?: boolean;
   avatar?: string;
+  createdAt?: string;
 };
 
 type CreateForm = {
@@ -210,6 +211,27 @@ function getInitials(name: string) {
   }
 
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
+function formatCreatedAt(value?: string) {
+  if (!value) return '—';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+
+  const day = new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+
+  const time = new Intl.DateTimeFormat('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).format(date);
+
+  return `${day}, ${time}`;
 }
 
 function roleClasses(role: Role) {
@@ -1022,6 +1044,10 @@ export default function Users() {
                     Status
                   </th>
 
+                  <th className="px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#475569]">
+                    Date
+                  </th>
+
                   <th className="px-5 py-4 text-right text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#475569]">
                     Actions
                   </th>
@@ -1034,7 +1060,7 @@ export default function Users() {
                 {loading && (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-5 py-16 text-center"
                     >
                       <div className="flex items-center justify-center gap-3 text-sm font-semibold text-[#64748B]">
@@ -1156,6 +1182,15 @@ export default function Users() {
                             </button>
                           </td>
 
+                          {/* Date */}
+                          <td className="px-5 py-4">
+                            <span className="whitespace-nowrap font-semibold text-[#334155]">
+                              {formatCreatedAt(
+                                user.createdAt,
+                              )}
+                            </span>
+                          </td>
+
                           {/* Actions */}
                           <td className="px-5 py-4 text-right">
                             <div className="flex justify-end">
@@ -1213,7 +1248,7 @@ export default function Users() {
                   !visible.length && (
                     <tr>
                       <td
-                        colSpan={5}
+                        colSpan={6}
                         className="px-5 py-16 text-center"
                       >
                         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#F8FAFC] text-[#94A3B8]">
