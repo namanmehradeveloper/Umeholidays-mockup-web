@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { BarChart3, CalendarDays, CheckCircle2, CircleDollarSign, FileText, RefreshCw, TrendingUp, Users } from 'lucide-react';
+import { BarChart3, CalendarDays, FileText, RefreshCw, Users } from 'lucide-react';
 import { api } from '../../lib/admin-api';
 
 type RangeKey = 'today' | 'yesterday' | '7d' | '30d' | 'month' | 'lastMonth' | 'year';
@@ -64,7 +64,7 @@ function TrendBars({ points }: { points: Array<{ _id: string; bookings: number; 
   const max = Math.max(1, ...points.map((p) => Number(p.bookings || 0)));
   if (!points.length) return <div className="grid h-56 place-items-center text-sm text-[#94A3B8]">No booking data for this period.</div>;
   return (
-    <div className="flex h-56 items-end gap-2 overflow-x-auto pb-5">
+    <div className="flex h-64 items-end gap-2 overflow-x-auto pb-5 pt-6">
       {points.map((point) => (
         <div key={point._id} className="group flex min-w-8 flex-1 flex-col items-center justify-end gap-2">
           <div className="relative w-full max-w-10 rounded-t-lg bg-[#b76b43]/80 transition-all group-hover:bg-[#b76b43]" style={{ height: `${Math.max(5, (Number(point.bookings || 0) / max) * 170)}px` }} title={`${point.bookings} bookings · ${inr(point.revenue)}`}>
@@ -128,7 +128,6 @@ export default function Dashboard() {
   const bookings = dashboard?.bookings || {};
   const enquiries = dashboard?.enquiries || {};
   const aBookings = analytics?.bookings || {};
-  const aEnquiries = analytics?.enquiries || {};
   const aUsers = analytics?.users || {};
 
   return (
@@ -146,11 +145,10 @@ export default function Dashboard() {
 
       {error && <div className="mb-5 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">{error}</div>}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard label="Total Users" value={users.total ?? 0} hint={`${users.active ?? 0} active · ${users.inactive ?? 0} inactive`} icon={Users} />
         <StatCard label="Total Bookings" value={bookings.total ?? 0} hint={`${bookings.byStatus?.confirmed || 0} confirmed · ${bookings.byStatus?.cancelled || 0} cancelled`} icon={CalendarDays} />
         <StatCard label="Total Enquiries" value={enquiries.total ?? 0} hint={`${enquiries.byStatus?.new || 0} new · ${enquiries.byStatus?.converted || 0} converted`} icon={FileText} />
-        <StatCard label="Successful Payments" value={inr(bookings.revenue?.successfulPayments)} hint={`${bookings.paymentStatus?.paid || 0} paid bookings`} icon={CircleDollarSign} />
       </div>
 
       <section className="mt-7 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-[0_1px_2px_rgba(17,24,39,0.04),0_8px_24px_rgba(17,24,39,0.04)]">
@@ -161,32 +159,23 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="mt-4 flex flex-wrap items-end gap-3">
-          <label className="text-xs font-medium text-[#64748B]">From<input type="date" value={custom.from} onChange={(e) => setCustom((x) => ({ ...x, from: e.target.value }))} className="mt-1 block rounded-lg border border-[#E2E8F0] px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-medium text-[#64748B]">To<input type="date" value={custom.to} onChange={(e) => setCustom((x) => ({ ...x, to: e.target.value }))} className="mt-1 block rounded-lg border border-[#E2E8F0] px-3 py-2 text-sm" /></label>
+          <div className="flex min-w-0 max-w-full flex-nowrap items-end gap-3">
+            <label className="min-w-0 flex-1 text-xs font-medium text-[#64748B] sm:flex-none">From<input type="date" value={custom.from} onChange={(e) => setCustom((x) => ({ ...x, from: e.target.value }))} className="mt-1 block w-full min-w-0 rounded-lg border border-[#E2E8F0] px-2 py-2 text-sm sm:px-3" /></label>
+            <label className="min-w-0 flex-1 text-xs font-medium text-[#64748B] sm:flex-none">To<input type="date" value={custom.to} onChange={(e) => setCustom((x) => ({ ...x, to: e.target.value }))} className="mt-1 block w-full min-w-0 rounded-lg border border-[#E2E8F0] px-2 py-2 text-sm sm:px-3" /></label>
+          </div>
           {custom.from && custom.to && <span className="pb-2 text-xs text-[#64748B]">Custom range applied</span>}
         </div>
 
         {analyticsLoading ? <div className="grid h-56 place-items-center text-sm text-[#94A3B8]">Calculating analytics…</div> : (
-          <div className="mt-6 grid gap-5 xl:grid-cols-[1.5fr_1fr]">
-            <div className="rounded-xl bg-[#F8FAFC] p-4"><div className="mb-3 flex items-center gap-2"><BarChart3 className="h-4 w-4 text-[#b76b43]" /><h3 className="font-semibold">Booking trend</h3></div><TrendBars points={aBookings.trend || []} /></div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-              <StatCard label="Gross Booking Value" value={inr(aBookings.revenue?.gross)} icon={CircleDollarSign} />
-              <StatCard label="Net Paid Revenue" value={inr(aBookings.revenue?.net)} hint={`${inr(aBookings.revenue?.refunded)} refunded`} icon={TrendingUp} />
-              <StatCard label="Average Booking Value" value={inr(aBookings.averageBookingValue)} icon={CircleDollarSign} />
-              <StatCard label="Conversion Rate" value={`${aEnquiries.conversionRate ?? 0}%`} hint={`${aEnquiries.byStatus?.converted || 0} converted enquiries`} icon={CheckCircle2} />
-            </div>
-          </div>
+          <div className="mt-6 w-full rounded-xl bg-[#F8FAFC] p-4"><div className="mb-3 flex items-center gap-2"><BarChart3 className="h-4 w-4 text-[#b76b43]" /><h3 className="font-semibold">Booking trend</h3></div><TrendBars points={aBookings.trend || []} /></div>
         )}
       </section>
 
       <div className="mt-7 grid gap-6 lg:grid-cols-2">
         <section className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-          <h2 className="font-serif text-2xl">Booking & payment status</h2>
+          <h2 className="font-serif text-2xl">Booking status</h2>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {Object.entries(bookings.byStatus || {}).map(([key, value]) => <div key={key} className="rounded-xl bg-[#F8FAFC] p-4"><p className="text-xs capitalize text-[#64748B]">{key}</p><p className="mt-1 text-xl font-semibold">{String(value)}</p></div>)}
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            {Object.entries(bookings.paymentStatus || {}).map(([key, value]) => <div key={key} className="rounded-xl border border-[#E2E8F0] p-4"><p className="text-xs capitalize text-[#64748B]">{key}</p><p className="mt-1 font-semibold">{String(value)}</p></div>)}
           </div>
         </section>
 
