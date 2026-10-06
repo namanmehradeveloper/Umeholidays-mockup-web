@@ -969,6 +969,160 @@ main {
   text-underline-offset: 3px;
 }
 
+.rich-text h4 {
+  margin: 1.2em 0 0.5em;
+  color: #1b1917;
+  font-size: 1.12em;
+  font-weight: 600;
+}
+
+.rich-text u {
+  text-decoration: underline;
+}
+
+.rich-text s,
+.rich-text del {
+  text-decoration: line-through;
+}
+
+.rich-text code {
+  border-radius: 4px;
+  background: #f4efe9;
+  padding: 0.1em 0.35em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.rich-text pre {
+  margin: 1em 0;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #1b1917;
+  padding: 1rem 1.15rem;
+  color: #f8f4ef;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.rich-text pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.rich-text hr {
+  margin: 1.5em 0;
+  border: 0;
+  border-top: 1px solid #e7e0d9;
+}
+
+.rich-text figure {
+  margin: 1.25em 0;
+}
+
+.rich-text figcaption {
+  margin-top: 0.5em;
+  color: #8a817a;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.rich-text figure.table {
+  overflow-x: auto;
+}
+
+.rich-text table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.rich-text th,
+.rich-text td {
+  border: 1px solid #e7e0d9;
+  padding: 0.55em 0.75em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.rich-text th {
+  background: #faf6f2;
+  color: #1b1917;
+  font-weight: 600;
+}
+
+.rich-text figure.image {
+  display: table;
+  clear: both;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.rich-text figure.image img {
+  display: block;
+  max-width: 100%;
+  min-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+}
+
+.rich-text figure.image figcaption {
+  display: table-caption;
+  caption-side: bottom;
+}
+
+.rich-text img.image_resized,
+.rich-text figure.image_resized {
+  max-width: 100%;
+}
+
+.rich-text figure.image_resized {
+  display: block;
+  box-sizing: border-box;
+}
+
+.rich-text figure.image_resized img {
+  width: 100%;
+}
+
+.rich-text img {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+}
+
+.rich-text .image-style-side {
+  float: right;
+  max-width: 50%;
+  margin: 0.25em 0 1em 1.5em;
+}
+
+.rich-text .image-style-align-left {
+  float: left;
+  margin: 0.25em 1.5em 1em 0;
+}
+
+.rich-text .image-style-align-right {
+  float: right;
+  margin: 0.25em 0 1em 1.5em;
+}
+
+.rich-text .image-style-block-align-left {
+  margin-left: 0;
+}
+
+.rich-text .image-style-block-align-right {
+  margin-right: 0;
+}
+
+.rich-text::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
 /* CKEditor — shared white theme */
 .ume-rich-editor {
   --ck-color-base-background: #ffffff;
@@ -992,6 +1146,25 @@ main {
   border-bottom: 1px solid #ece5df;
   background: #fdfbf9;
   padding: 6px 8px;
+}
+
+/* The wrapper cannot clip its children (toolbar dropdowns must overflow), so round the inner edges instead. */
+.ume-rich-editor .ck.ck-editor__top .ck-sticky-panel__content,
+.ume-rich-editor .ck.ck-editor__top .ck-toolbar {
+  border-top-left-radius: calc(1rem - 1px);
+  border-top-right-radius: calc(1rem - 1px);
+}
+
+.ume-rich-editor .ck.ck-editor__main > .ck-editor__editable {
+  border-bottom-left-radius: calc(1rem - 1px) !important;
+  border-bottom-right-radius: calc(1rem - 1px) !important;
+}
+
+.ume-rich-editor .ck-content h4 {
+  margin: 0.7rem 0 0.35rem;
+  color: #1b1917;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .ume-rich-editor .ck.ck-editor__main > .ck-editor__editable {

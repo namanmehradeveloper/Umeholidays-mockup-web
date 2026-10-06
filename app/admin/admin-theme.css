@@ -201,6 +201,7 @@ body:has(.admin-auth) {
 }
 .ume-rich-editor .ck-content h2 { font-size: 1.35rem; font-weight: 700; margin: .8rem 0 .4rem; }
 .ume-rich-editor .ck-content h3 { font-size: 1.1rem; font-weight: 700; margin: .7rem 0 .35rem; }
+.ume-rich-editor .ck-content h4 { font-size: 1rem; font-weight: 700; margin: .65rem 0 .3rem; }
 .ume-rich-editor .ck-content p { margin: .45rem 0; }
 .ume-rich-editor .ck-content ul,
 .ume-rich-editor .ck-content ol { padding-left: 1.5rem; }

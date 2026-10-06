@@ -416,7 +416,7 @@ function listToHtml(value: unknown) {
       const text = String(item ?? '');
 
       if (
-        /<(?:p|h2|h3|strong|em|ul|ol|blockquote|br\b)/i.test(
+        /<(?:p|h2|h3|h4|strong|em|ul|ol|blockquote|br\b|hr\b|pre|figure|table|span|u>|s>|code)/i.test(
           text
         )
       ) {
