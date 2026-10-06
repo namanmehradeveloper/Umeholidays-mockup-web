@@ -1,0 +1,2 @@
+import {Router} from 'express';import {authorize,protect} from '../middleware/auth.js';import {listRecords,getRecord,createRecord,updateRecord,reorderRecords,deleteRecord} from '../controllers/adminRecordController.js';
+const router=Router();router.use(protect,authorize('admin'));router.get('/:module',listRecords);router.post('/:module/reorder',reorderRecords);router.get('/:module/:id',getRecord);router.post('/:module',createRecord);router.patch('/:module/:id',updateRecord);router.delete('/:module/:id',deleteRecord);export default router;

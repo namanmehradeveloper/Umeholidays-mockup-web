@@ -1,0 +1,1 @@
+import AuthForm from '../../../components/auth/AuthForm';export default function Page(){return <main className="min-h-screen bg-white px-5 pb-20 pt-36"><div className="mx-auto max-w-md mb-8"><p className="text-[10px] uppercase tracking-[.25em] text-[#a35b36]">UME Holidays</p><h1 className="mt-2 font-serif text-5xl">Create your account</h1></div><AuthForm mode="register"/></main>}

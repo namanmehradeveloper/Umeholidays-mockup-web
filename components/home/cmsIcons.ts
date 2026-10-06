@@ -1,0 +1,41 @@
+import {
+  BookOpen,
+  CalendarDays,
+  Camera,
+  Clock3,
+  Compass,
+  Crown,
+  Gem,
+  Headphones,
+  Heart,
+  Landmark,
+  Leaf,
+  MapPin,
+  Route,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Users,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+/** Icon keys stored on CMS items (e.g. Why UME reasons) mapped to their components. */
+export const CMS_ICONS: Record<string, LucideIcon> = {
+  'book-open': BookOpen,
+  calendar: CalendarDays,
+  camera: Camera,
+  clock: Clock3,
+  compass: Compass,
+  crown: Crown,
+  gem: Gem,
+  headphones: Headphones,
+  heart: Heart,
+  landmark: Landmark,
+  leaf: Leaf,
+  'map-pin': MapPin,
+  route: Route,
+  'shield-check': ShieldCheck,
+  sparkles: Sparkles,
+  star: Star,
+  users: Users,
+};

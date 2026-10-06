@@ -1,0 +1,1 @@
+export default function Reveal({children,className=''}:{children:React.ReactNode;className?:string}){return <div className={`animate-rise ${className}`}>{children}</div>}

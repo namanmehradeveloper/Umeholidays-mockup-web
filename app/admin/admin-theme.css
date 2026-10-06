@@ -1,0 +1,225 @@
+/* UME Holidays admin-only design system. Public website styles are intentionally untouched. */
+
+html:has(.admin-main),
+html:has(.admin-auth),
+body:has(.admin-main),
+body:has(.admin-auth) {
+  background: #f4f7fc;
+}
+
+.admin-main,
+.admin-auth {
+  background: #f4f7fc;
+  color: #0f172a;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+}
+
+.admin-main h1,
+.admin-auth h1 {
+  margin: 0;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.admin-main h2 {
+  margin: 0;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.admin-main .font-serif,
+.admin-auth .font-serif {
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+}
+
+@media (min-width: 640px) {
+  .admin-main h1,
+  .admin-auth h1 {
+    font-size: 1.875rem;
+  }
+}
+
+/* Palette bridge for existing Tailwind utility classes. */
+.admin-main .text-\[\#a35b36\],
+.admin-auth .text-\[\#a35b36\] { color: #1769ff; font-weight: 650; }
+.admin-main .text-black\/50,
+.admin-main .text-black\/45,
+.admin-main .text-black\/40,
+.admin-auth .text-black\/50,
+.admin-auth .text-black\/40 { color: #64748b; }
+.admin-main .text-black\/35 { color: #94a3b8; }
+.admin-main .text-black\/85,
+.admin-main .text-\[\#1b1917\] { color: #0f172a; }
+
+.admin-main .bg-\[\#faf8f4\],
+.admin-main .bg-\[\#f8f5f0\],
+.admin-main .bg-\[\#f6f2ec\],
+.admin-main .hover\:bg-\[\#f6f2ec\]:hover { background-color: #f4f7fc; }
+
+.admin-main .rounded-2xl.border.bg-white,
+.admin-main a.rounded-2xl.border.bg-white {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.045);
+}
+
+.admin-main .fixed .rounded-2xl.border.bg-white {
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+}
+
+.admin-main .rounded-3xl.bg-white,
+.admin-auth form {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
+}
+
+.admin-main a.rounded-2xl.border.bg-white { transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.admin-main a.rounded-2xl.border.bg-white:hover {
+  border-color: #bfdbfe;
+  box-shadow: 0 12px 28px rgba(23, 105, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.admin-main .border-black\/5,
+.admin-main .border-black\/10,
+.admin-main .border-black\/15,
+.admin-main .border-2.border-dashed { border-color: #e2e8f0; }
+
+.admin-main .border-red-200,
+.admin-main button.border-red-200,
+.admin-main button.border-red-200:hover {
+  border-color: #fecaca;
+  color: #dc2626;
+  background: #fff;
+}
+
+.admin-main table { color: #0f172a; }
+.admin-main thead th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: .6875rem;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.admin-main tbody td { color: #0f172a; vertical-align: middle; }
+.admin-main tbody tr { transition: background-color .15s ease; }
+.admin-main tbody tr:hover { background: #f8fbff; }
+
+.admin-main input:not(.sr-only),
+.admin-main select,
+.admin-main textarea,
+.admin-auth input,
+.admin-auth select,
+.admin-auth textarea {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: .75rem;
+  background: #fff;
+  color: #0f172a;
+  box-shadow: none;
+}
+
+.admin-main input:not(.sr-only):focus,
+.admin-main select:focus,
+.admin-main textarea:focus,
+.admin-auth input:focus,
+.admin-auth select:focus,
+.admin-auth textarea:focus {
+  border-color: #1769ff;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(23, 105, 255, .12);
+}
+
+.admin-main input::placeholder,
+.admin-main textarea::placeholder,
+.admin-auth input::placeholder,
+.admin-auth textarea::placeholder { color: #94a3b8; }
+.admin-main :focus-visible,
+.admin-auth :focus-visible { outline-color: #1769ff; }
+
+.admin-main .bg-red-50 { border: 1px solid #fee2e2; color: #b91c1c; }
+.admin-main .bg-green-50 { border: 1px solid #dcfce7; color: #15803d; }
+
+/* Existing primary buttons become the same blue across all admin modules. */
+.admin-main button.bg-\[\#111827\],
+.admin-main button.bg-\[\#1b1917\],
+.admin-auth button {
+  color: #fff;
+  background: #1769ff;
+  border: 1px solid #1769ff;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.admin-main button.bg-\[\#111827\]:hover,
+.admin-main button.bg-\[\#1b1917\]:hover,
+.admin-auth button:hover {
+  background: #155eef;
+  border-color: #155eef;
+  box-shadow: 0 6px 18px rgba(23, 105, 255, .2);
+}
+.admin-main button.bg-\[\#111827\]:active,
+.admin-main button.bg-\[\#1b1917\]:active,
+.admin-auth button:active { transform: translateY(1px); }
+
+.admin-main > header,
+.admin-main > footer { background: #fff; border-color: #e2e8f0; }
+
+/* Tables: keep actions compact and easy to scan. */
+.admin-main table th:last-child,
+.admin-main table td:last-child { white-space: nowrap; }
+.admin-main table tbody tr:last-child { border-bottom-width: 0; }
+
+@media (max-width: 639px) {
+  .admin-main h1 { font-size: 1.65rem; }
+  .admin-main .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+}
+
+/* CKEditor 5 - UME Holidays admin */
+.ume-rich-editor .ck.ck-toolbar {
+  border: 0 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+.ume-rich-editor .ck.ck-editor__main > .ck-editor__editable {
+  min-height: 190px;
+  border: 0 !important;
+  padding: 1rem 1rem 1.25rem !important;
+  box-shadow: none !important;
+  color: #0f172a;
+}
+.ume-rich-editor .ck.ck-editor__editable.ck-focused {
+  box-shadow: inset 0 0 0 1px #1769ff !important;
+}
+.ume-rich-editor .ck-content h2 { font-size: 1.35rem; font-weight: 700; margin: .8rem 0 .4rem; }
+.ume-rich-editor .ck-content h3 { font-size: 1.1rem; font-weight: 700; margin: .7rem 0 .35rem; }
+.ume-rich-editor .ck-content p { margin: .45rem 0; }
+.ume-rich-editor .ck-content ul,
+.ume-rich-editor .ck-content ol { padding-left: 1.5rem; }
+.ume-rich-editor .ck-content blockquote { border-left: 3px solid #1769ff; margin: .75rem 0; padding-left: 1rem; color: #475569; }
+.ume-rich-editor .ck.ck-button.ck-on { color: #1769ff !important; }
+@media (max-width: 640px) {
+  .ume-rich-editor .ck.ck-toolbar { flex-wrap: wrap; }
+  .ume-rich-editor .ck.ck-editor__main > .ck-editor__editable { min-height: 160px; }
+}
+
+.rich-text p { margin: .65rem 0; }
+.rich-text h2 { margin: 1.25rem 0 .5rem; font-family: Georgia, serif; font-size: 1.65rem; line-height: 1.25; }
+.rich-text h3 { margin: 1rem 0 .4rem; font-family: Georgia, serif; font-size: 1.25rem; line-height: 1.3; }
+.rich-text ul, .rich-text ol { margin: .75rem 0; padding-left: 1.5rem; }
+.rich-text blockquote { margin: 1rem 0; border-left: 3px solid #a35b36; padding-left: 1rem; color: rgba(0,0,0,.55); }
+.rich-text a { text-decoration: underline; text-underline-offset: 3px; }
+
+
+@keyframes adminModalIn {
+  from { transform: translateY(14px) scale(.975); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
