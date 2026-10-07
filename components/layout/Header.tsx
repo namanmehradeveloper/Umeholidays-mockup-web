@@ -17,9 +17,8 @@ const nav = [
   { label: "Journeys", href: "/tours" },
   { label: "Destinations", href: "/destinations" },
   { label: "Experiences", href: "/experiences" },
-  { label: "Stories", href: "/stories" },
+  { label: "Travel Essentials", href: "/travel-essentials" },
   { label: "City Events", href: "/events" },
-
   { label: "About", href: "/about" },
   { label: "Contact Us", href: "/contact" },
 ];
