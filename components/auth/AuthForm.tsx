@@ -4,9 +4,10 @@ import axios from 'axios';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { isValidPhone, PHONE_ERROR, phoneDigits } from '../../lib/phone';
+
 const AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
-const PHONE_PATTERN = '^\\+?(?:[\\s\\(\\)\\-]*\\d){7,15}[\\s\\(\\)\\-]*$';
 
 type AuthMode = 'login' | 'register';
 
@@ -126,6 +127,10 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (mode === 'register' && !isValidPhone(form.phone)) {
+      setError(PHONE_ERROR);
+      return;
+    }
     setLoading(true);
     setError('');
 
@@ -224,12 +229,13 @@ export default function AuthForm({ mode }: { mode: AuthMode }) {
         <input
           required
           type="tel"
-          maxLength={20}
-          pattern={PHONE_PATTERN}
-          title="Enter a valid phone number (7-15 digits, optional leading +)"
-          placeholder="Phone"
+          inputMode="numeric"
+          autoComplete="tel-national"
+          pattern="[6-9][0-9]{9}"
+          title={PHONE_ERROR}
+          placeholder="10-digit mobile number"
           value={form.phone}
-          onChange={(event) => setForm({ ...form, phone: event.target.value })}
+          onChange={(event) => setForm({ ...form, phone: phoneDigits(event.target.value) })}
           className="mb-3 w-full rounded-xl border p-3"
         />
       )}

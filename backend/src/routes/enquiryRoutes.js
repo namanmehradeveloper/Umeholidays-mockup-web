@@ -24,7 +24,7 @@ router.post(
   validate({
     name: { type: 'string', required: true, min: 2, max: 100 },
     email: { type: 'email', required: true },
-    phone: { type: 'string', max: 30 },
+    phone: { type: 'phone' },
     travelDates: { type: 'string', max: 100 },
     destination: { type: 'string', max: 200 },
     travellers: { type: 'integer', min: 1, max: 100 },

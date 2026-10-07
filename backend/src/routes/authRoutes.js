@@ -6,7 +6,6 @@ import { imageUpload } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
 
 const password = { type: 'string', required: true, min: 8, max: 128 };
-const phonePattern = /^\+?(?:[\s()-]*\d){7,15}[\s()-]*$/;
 
 const router = Router();
 
@@ -22,13 +21,7 @@ router.post(
     name: { type: 'string', required: true, min: 2, max: 80 },
     email: { type: 'email', required: true },
     password,
-    phone: {
-      type: 'string',
-      required: true,
-      max: 20,
-      pattern: phonePattern,
-      patternMessage: 'must be a valid phone number (7-15 digits, optional leading +)',
-    },
+    phone: { type: 'phone', required: true },
   }),
   register,
 );
@@ -65,7 +58,7 @@ router.get('/me', protect, getMe);
 router.patch(
   '/me',
   protect,
-  validate({ name: { type: 'string', min: 2, max: 80 }, phone: { type: 'string', max: 20 } }, { partial: true }),
+  validate({ name: { type: 'string', min: 2, max: 80 }, phone: { type: 'phone' } }, { partial: true }),
   updateMe,
 );
 

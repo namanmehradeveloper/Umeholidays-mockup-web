@@ -31,7 +31,7 @@ router.post(
       shape: {
         name: { type: 'string', min: 2, max: 100 },
         email: { type: 'email' },
-        phone: { type: 'string', max: 30 },
+        phone: { type: 'phone' },
       },
     },
     specialRequests: { type: 'string', max: 2000 },

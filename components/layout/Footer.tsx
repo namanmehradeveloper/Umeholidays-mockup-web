@@ -23,7 +23,9 @@ const companyLinks = [
   ['Contact', '/contact'],
   ['Offers', '/offers'],
   ['Events', '/events'],
+  ['Stories ', '/stories'],
 ];
+
 
 export default function Footer() {
   const site = useSiteSettings();

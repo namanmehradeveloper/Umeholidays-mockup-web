@@ -7,7 +7,7 @@ import { ROLES } from '../models/User.js';
 const fields = {
   name: { type: 'string', required: true, min: 2, max: 80 },
   email: { type: 'email', required: true },
-  phone: { type: 'string', max: 20 },
+  phone: { type: 'phone' },
   role: { type: 'string', enum: ROLES, default: 'user' },
 };
 

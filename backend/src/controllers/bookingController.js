@@ -2,6 +2,7 @@ import { isAdmin } from '../middleware/auth.js';
 import Booking from '../models/Booking.js';
 import Tour from '../models/Tour.js';
 import ApiError from '../utils/ApiError.js';
+import { normalizePhone, PHONE_MESSAGE } from '../utils/phone.js';
 
 import {
   asString,
@@ -77,11 +78,8 @@ function normalizeContact(req) {
     .toLowerCase()
     .slice(0, 200);
 
-  const phone = String(
-    contactBody.phone || req.user?.phone || ''
-  )
-    .trim()
-    .slice(0, 30);
+  const rawPhone = contactBody.phone || req.user?.phone || '';
+  const phone = normalizePhone(rawPhone);
 
   if (!name) {
     throw ApiError.badRequest('Name is required');
@@ -91,8 +89,12 @@ function normalizeContact(req) {
     throw ApiError.badRequest('Email is required');
   }
 
-  if (!phone) {
+  if (!rawPhone) {
     throw ApiError.badRequest('Phone number is required');
+  }
+
+  if (!phone) {
+    throw ApiError.badRequest(`Phone number ${PHONE_MESSAGE}`);
   }
 
   return {

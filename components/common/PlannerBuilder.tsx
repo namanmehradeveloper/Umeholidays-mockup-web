@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Loader2, RefreshCw } from 'lucide-react';
 
 import { apiErrorMessage, apiFetch } from '../../lib/api';
+import { isValidPhone, PHONE_ERROR, phoneDigits } from '../../lib/phone';
 import { PLANNER_ICONS, formatPlannerAmount } from '../../lib/planner';
 import type {
   PlannerChoice,
@@ -138,7 +139,7 @@ export default function PlannerBuilder({ initialSettings }: { initialSettings?: 
           ...current,
           name: current.name || data.name || '',
           email: current.email || data.email || '',
-          phone: current.phone || data.phone || '',
+          phone: current.phone || phoneDigits(data.phone || ''),
         }));
       })
       .catch(() => undefined);
@@ -257,13 +258,17 @@ export default function PlannerBuilder({ initialSettings }: { initialSettings?: 
     if (!settings || !quoteRequest) return;
     const name = contact.name.trim();
     const email = contact.email.trim();
-    const phone = contact.phone.trim();
+    const phone = contact.phone;
     if (name.length < 2 || !email || !phone) {
       setSubmitError(settings.labels.contactRequired || '');
       return;
     }
     if (!EMAIL_RE.test(email)) {
       setSubmitError(settings.labels.invalidEmail || '');
+      return;
+    }
+    if (!isValidPhone(phone)) {
+      setSubmitError(PHONE_ERROR);
       return;
     }
 
@@ -457,7 +462,7 @@ export default function PlannerBuilder({ initialSettings }: { initialSettings?: 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <input aria-label={labels.name} placeholder={labels.name} autoComplete="name" value={contact.name} onChange={(event) => setContact({ ...contact, name: event.target.value })} className={INPUT} />
           <input aria-label={labels.email} placeholder={labels.email} type="email" autoComplete="email" value={contact.email} onChange={(event) => setContact({ ...contact, email: event.target.value })} className={INPUT} />
-          <input aria-label={labels.phone} placeholder={labels.phone} type="tel" autoComplete="tel" value={contact.phone} onChange={(event) => setContact({ ...contact, phone: event.target.value })} className={`${INPUT} sm:col-span-2`} />
+          <input aria-label={labels.phone} placeholder={labels.phone} type="tel" inputMode="numeric" autoComplete="tel-national" title={PHONE_ERROR} value={contact.phone} onChange={(event) => setContact({ ...contact, phone: phoneDigits(event.target.value) })} className={`${INPUT} sm:col-span-2`} />
           <textarea aria-label={labels.message} placeholder={labels.message} rows={3} maxLength={5000} value={contact.message} onChange={(event) => setContact({ ...contact, message: event.target.value })} className={`${INPUT} sm:col-span-2`} />
           {submitError ? <p className="text-sm text-red-600 sm:col-span-2" role="alert">{submitError}</p> : null}
         </div>

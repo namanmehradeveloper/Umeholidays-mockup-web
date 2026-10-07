@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import { api, downloadAdminCsv, getAdminUser } from '../../lib/admin-api';
+import { isValidPhone, PHONE_ERROR, phoneDigits } from '../../lib/phone';
 import InputIcon from './InputIcon';
 
 import {
@@ -140,8 +141,8 @@ function validateCreate(form: CreateForm) {
     return 'Password must be between 8 and 128 characters';
   }
 
-  if (form.phone.trim().length > 20) {
-    return 'Phone must be at most 20 characters';
+  if (form.phone && !isValidPhone(form.phone)) {
+    return PHONE_ERROR;
   }
 
   if (!ROLES.includes(form.role)) {
@@ -1373,10 +1374,19 @@ export default function Users() {
                             ? 'password'
                             : key === 'email'
                               ? 'email'
-                              : 'text'
+                              : key === 'phone'
+                                ? 'tel'
+                                : 'text'
+                        }
+                        inputMode={
+                          key === 'phone'
+                            ? 'numeric'
+                            : undefined
                         }
                         placeholder={
-                          labels[key]
+                          key === 'phone'
+                            ? '10-digit mobile number'
+                            : labels[key]
                         }
                         value={
                           createForm[key]
@@ -1387,8 +1397,10 @@ export default function Users() {
                           setCreateForm({
                             ...createForm,
                             [key]:
-                              event.target
-                                .value,
+                              key === 'phone'
+                                ? phoneDigits(event.target.value)
+                                : event.target
+                                    .value,
                           })
                         }
                         className="w-full rounded-xl border border-[#E2E8F0] bg-white py-3 pl-10 pr-4 text-sm font-medium text-[#111827] outline-none transition focus:border-[#b76b43] focus:ring-2 focus:ring-[#111827]/5 placeholder:text-[#94A3B8]"

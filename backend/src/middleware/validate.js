@@ -1,4 +1,5 @@
 import ApiError from '../utils/ApiError.js';
+import { normalizePhone, PHONE_MESSAGE } from '../utils/phone.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -13,6 +14,11 @@ function coerce(rule, raw) {
       if (rule.max !== undefined && value.length > rule.max) return { error: `must be at most ${rule.max} characters` };
       if (rule.pattern && !rule.pattern.test(value)) return { error: rule.patternMessage || 'has an invalid format' };
       return { value };
+    }
+    case 'phone': {
+      if (typeof raw !== 'string') return { error: 'must be a string' };
+      const value = normalizePhone(raw);
+      return value ? { value } : { error: PHONE_MESSAGE };
     }
     case 'number':
     case 'integer': {

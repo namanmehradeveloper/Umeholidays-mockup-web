@@ -13,7 +13,6 @@ import {
   Clock3,
   Copy,
   History,
-  IdCard,
   KeyRound,
   Loader2,
   Lock,
@@ -25,6 +24,7 @@ import {
 } from 'lucide-react';
 
 import { apiFetch } from '../../../lib/api';
+import { isValidPhone, PHONE_ERROR, phoneDigits } from '../../../lib/phone';
 
 /* =========================================================
    TYPES
@@ -128,7 +128,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [copied, setCopied] = useState<'email' | 'id' | null>(null);
+  const [copied, setCopied] = useState<'email' | null>(null);
 
   /* =======================================================
      LOAD PROFILE
@@ -154,7 +154,7 @@ export default function Page() {
 
         setForm({
           name: profile?.name || '',
-          phone: profile?.phone || '',
+          phone: phoneDigits(profile?.phone || ''),
         });
 
         localStorage.setItem('ume_user', JSON.stringify(profile));
@@ -192,6 +192,11 @@ export default function Page() {
       return;
     }
 
+    if (form.phone && !isValidPhone(form.phone)) {
+      setError(PHONE_ERROR);
+      return;
+    }
+
     setMessage('');
     setError('');
     setSaving(true);
@@ -201,7 +206,7 @@ export default function Page() {
         method: 'PATCH',
         data: {
           name: form.name.trim(),
-          phone: form.phone.trim(),
+          phone: form.phone,
         },
       });
 
@@ -211,7 +216,7 @@ export default function Page() {
 
       setForm({
         name: profile?.name || '',
-        phone: profile?.phone || '',
+        phone: phoneDigits(profile?.phone || ''),
       });
 
       localStorage.setItem('ume_user', JSON.stringify(profile));
@@ -230,7 +235,7 @@ export default function Page() {
      COPY
   ======================================================= */
 
-  const copyValue = async (type: 'email' | 'id', value: string) => {
+  const copyValue = async (type: 'email', value: string) => {
     try {
       await navigator.clipboard.writeText(value);
 
@@ -293,8 +298,6 @@ export default function Page() {
       </PageShell>
     );
   }
-
-  const accountId = user.id || user._id;
 
   /* =======================================================
      PAGE
@@ -421,16 +424,18 @@ export default function Page() {
                 <input
                   id="profile-phone"
                   type="tel"
-                  maxLength={20}
-                  autoComplete="tel"
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  pattern="[6-9][0-9]{9}"
+                  title={PHONE_ERROR}
                   value={form.phone}
                   onChange={(event) =>
                     setForm((previous) => ({
                       ...previous,
-                      phone: event.target.value,
+                      phone: phoneDigits(event.target.value),
                     }))
                   }
-                  placeholder="+91 98765 43210"
+                  placeholder="10-digit mobile number"
                   className={inputClass}
                 />
               </Field>
@@ -521,51 +526,6 @@ export default function Page() {
         =============================================== */}
 
         <aside className="space-y-6">
-          <section className="overflow-hidden rounded-[28px] border border-[#ece7e2] bg-white shadow-[0_12px_40px_rgba(27,25,23,0.04)]">
-            <CardHeader
-              icon={IdCard}
-              title="Account details"
-              description="System-managed information."
-              compact
-            />
-
-            <dl className="divide-y divide-[#f0ebe6] px-5 sm:px-6">
-              <DetailRow label="Status">
-                <StatusPill active={user.isActive} />
-              </DetailRow>
-
-              <DetailRow label="Account role">
-                <span className="text-sm font-medium text-[#3f3a36]">{formatRole(user.role)}</span>
-              </DetailRow>
-
-              <div className="py-4">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9a928b]">
-                  Unique account ID
-                </dt>
-
-                <dd className="mt-2 flex items-center gap-2">
-                  <code className="min-w-0 flex-1 break-all rounded-xl bg-[#faf8f6] px-3 py-2.5 font-mono text-[11px] leading-5 text-[#514b46]">
-                    {accountId}
-                  </code>
-
-                  <button
-                    type="button"
-                    onClick={() => copyValue('id', accountId)}
-                    title="Copy account ID"
-                    aria-label="Copy account ID"
-                    className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#e6e0da] bg-white text-[#645d57] transition-all hover:border-[#b76b43]/40 hover:text-[#a35b36]"
-                  >
-                    {copied === 'id' ? (
-                      <Check size={15} className="text-emerald-600" />
-                    ) : (
-                      <Copy size={14} />
-                    )}
-                  </button>
-                </dd>
-              </div>
-            </dl>
-          </section>
-
           <Link
             href="/account/password"
             className="group flex items-start gap-4 rounded-[24px] border border-[#ece7e2] bg-[#faf6f2] p-5 transition-all hover:-translate-y-0.5 hover:border-[#b76b43]/30 hover:bg-white hover:shadow-[0_16px_38px_rgba(27,25,23,0.07)] sm:p-6"
@@ -695,15 +655,6 @@ function Stat({ icon: Icon, label, value }: { icon: IconType; label: string; val
         <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9a928b]">{label}</dt>
         <dd className="mt-0.5 truncate text-sm font-medium text-[#3f3a36]">{value}</dd>
       </div>
-    </div>
-  );
-}
-
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-4 py-4">
-      <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9a928b]">{label}</dt>
-      <dd>{children}</dd>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '../../lib/api';
+import { isValidPhone, PHONE_ERROR, phoneDigits } from '../../lib/phone';
 
 type BookingFormProps = {
   tour: {
@@ -47,6 +48,11 @@ export default function BookingForm({ tour }: BookingFormProps) {
 
     if (!token) {
       router.push(`/auth/login?next=/tours/${tour.slug}`);
+      return;
+    }
+
+    if (!isValidPhone(form.phone)) {
+      setError(PHONE_ERROR);
       return;
     }
 
@@ -213,12 +219,17 @@ export default function BookingForm({ tour }: BookingFormProps) {
 
         <input
           required
+          type="tel"
+          inputMode="numeric"
+          autoComplete="tel-national"
+          pattern="[6-9][0-9]{9}"
+          title={PHONE_ERROR}
           value={form.phone}
           onChange={(e) =>
-            updateField('phone', e.target.value)
+            updateField('phone', phoneDigits(e.target.value))
           }
           className="w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#1b1917] outline-none transition placeholder:text-black/35 focus:border-[#B76B43] focus:ring-2 focus:ring-[#B76B43]/10"
-          placeholder="+91 98765 43210"
+          placeholder="10-digit mobile number"
         />
       </div>
 

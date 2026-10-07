@@ -29,6 +29,7 @@ import {
 import Container from "../../components/common/Container";
 import { useSiteSettings } from "../../components/common/useSiteSettings";
 import { apiFetch, apiList } from "../../lib/api";
+import { isValidPhone, PHONE_ERROR, phoneDigits } from "../../lib/phone";
 
 /* =========================================================
    CONSTANTS
@@ -46,8 +47,6 @@ const LOCATION_IMAGE =
 const MESSAGE_LIMIT = 500;
 
 const FALLBACK_DESTINATIONS = ["Jaipur", "Jodhpur", "Udaipur", "Jaisalmer", "Bikaner", "Mount Abu"];
-
-const COUNTRY_CODES = ["+91", "+1", "+44", "+61", "+971", "+65"];
 
 const TRAVELLER_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 
@@ -237,8 +236,13 @@ function EnquiryForm() {
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
 
-    const phone = String(form.get("phone") || "").trim();
+    const phone = phoneDigits(String(form.get("phone") || ""));
     const travellers = Number(form.get("travellers"));
+
+    if (phone && !isValidPhone(phone)) {
+      setError(PHONE_ERROR);
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -249,7 +253,7 @@ function EnquiryForm() {
         data: {
           name: String(form.get("name") || "").trim(),
           email: String(form.get("email") || "").trim(),
-          phone: phone ? `${form.get("countryCode")} ${phone}` : undefined,
+          phone: phone || undefined,
           travelDates: String(form.get("travelDates") || "").trim() || undefined,
           destination: String(form.get("destination") || "") || undefined,
           travellers: travellers > 0 ? travellers : undefined,
@@ -307,27 +311,20 @@ function EnquiryForm() {
 
             <Field label="Phone Number">
               <div className="flex">
-                <div className="relative">
-                  <select
-                    name="countryCode"
-                    defaultValue="+91"
-                    aria-label="Country code"
-                    className={`${inputClass} w-[84px] appearance-none rounded-r-none border-r-0 pr-7`}
-                  >
-                    {COUNTRY_CODES.map((code) => (
-                      <option key={code} value={code}>
-                        {code}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#8a837c]" />
-                </div>
+                <span className="flex h-12 items-center rounded-l-xl border border-r-0 border-[#e4ddd4] bg-[#faf8f4] px-4 text-sm text-[#6b645d]">
+                  +91
+                </span>
                 <input
                   name="phone"
                   type="tel"
-                  maxLength={20}
+                  inputMode="numeric"
                   autoComplete="tel-national"
-                  placeholder="Your phone number"
+                  pattern="[6-9][0-9]{9}"
+                  title={PHONE_ERROR}
+                  onChange={(event) => {
+                    event.currentTarget.value = phoneDigits(event.currentTarget.value);
+                  }}
+                  placeholder="10-digit mobile number"
                   className={`${inputClass} min-w-0 flex-1 rounded-l-none`}
                 />
               </div>
