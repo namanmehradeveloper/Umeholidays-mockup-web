@@ -16,6 +16,7 @@ export async function uploadImage(req, res) {
     'ume-holidays/experiences',
     'ume-holidays/events',
     'ume-holidays/stories',
+    'ume-holidays/offers',
     'ume-holidays/users',
   ]);
   const folder = allowedFolders.has(requestedFolder) ? requestedFolder : 'ume-holidays';

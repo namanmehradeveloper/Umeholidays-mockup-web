@@ -74,6 +74,40 @@ export type Story = {
   content: string[];
 };
 
+export type OfferDiscountType = 'none' | 'percentage' | 'fixed';
+export type OfferAvailability = 'live' | 'scheduled' | 'expired' | 'inactive';
+
+export type Offer = {
+  _id: string;
+  slug: string;
+  title: string;
+  subtitle?: string;
+  summary?: string;
+  description?: string;
+  terms?: string;
+  highlights: string[];
+  duration?: string;
+  destinations: string[];
+  tour?: Pick<Tour, 'title' | 'slug'> & { _id: string; image?: string; duration?: string; price?: number } | null;
+  image?: string;
+  gallery: string[];
+  originalPrice?: number | null;
+  discountType: OfferDiscountType;
+  discountValue: number;
+  discountAmount: number;
+  finalPrice: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  status: 'active' | 'inactive';
+  availability: OfferAvailability;
+  featured: boolean;
+  sortOrder: number;
+  metaTitle?: string;
+  metaDescription?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type CmsRecord = {
   _id: string;
   title: string;

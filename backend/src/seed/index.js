@@ -1,7 +1,8 @@
 import env from '../config/env.js';
 import { connectDB, disconnectDB } from '../config/db.js';
-import { AdminRecord, Destination, Experience, Story, Tour, User } from '../models/index.js';
+import { AdminRecord, Destination, Event, Experience, Offer, Story, Tour, User } from '../models/index.js';
 import { events } from './events.js';
+import { offers } from './offers.js';
 import { destinations, tours, experiences, stories, faqs, testimonials, moods, seasonal } from './content.js';
 
 const force = process.argv.includes('--force');
@@ -79,6 +80,7 @@ async function main() {
     ...story,
     date: new Date(story.date),
   })));
+  await upsertContent(Offer, offers);
 
   await upsertRecords('faqs', faqs.map(([question, answer]) => ({
     title: question,

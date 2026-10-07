@@ -1,35 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
 import Container from "../../components/common/Container";
 import SectionHeading from "../../components/common/SectionHeading";
 import {
   ArrowUpRight,
   CalendarDays,
+  Clock3,
   MapPin,
   Sparkles,
+  Star,
 } from "lucide-react";
+import { apiList } from "../../lib/api";
+import {
+  formatInr,
+  hasOfferDiscount,
+  offerDiscountLabel,
+  offerValidityLabel,
+} from "../../lib/offers";
+import type { Offer } from "../../types";
 
-const offers = [
-  [
-    "Jaipur Heritage Escape",
-    "3 Days / 2 Nights",
-    "Jaipur",
-    "From ₹16,900",
-  ],
-  [
-    "Desert to Palace",
-    "6 Days / 5 Nights",
-    "Jaisalmer · Jodhpur · Udaipur",
-    "From ₹32,900",
-  ],
-  [
-    "Udaipur & Mount Abu Retreat",
-    "5 Days / 4 Nights",
-    "Udaipur · Mount Abu",
-    "From ₹28,900",
-  ],
-];
+export const dynamic = "force-dynamic";
 
-export default function Offers() {
+export default async function Offers() {
+  const offers = await apiList<Offer>("/offers/public?limit=100").catch(() => [] as Offer[]);
+
   return (
     <main className="min-h-screen bg-white text-[#1b1917]">
       {/* =====================================================
@@ -62,179 +56,195 @@ export default function Offers() {
       ====================================================== */}
       <section className="bg-white pb-24 pt-16 sm:pb-28 sm:pt-20 lg:pb-36">
         <Container>
-          <div className="grid gap-6 lg:grid-cols-3">
-            {offers.map((offer, index) => (
-              <article
-                key={offer[0]}
-                className="
-                  group
-                  relative
-                  overflow-hidden
-                  rounded-[28px]
-                  border
-                  border-[#e7dfd6]
-                  bg-white
-                  p-7
-                  shadow-[0_12px_40px_rgba(27,25,23,0.05)]
-                  transition-all
-                  duration-500
-                  hover:-translate-y-1
-                  hover:border-[#b76b43]/30
-                  hover:shadow-[0_25px_60px_rgba(27,25,23,0.10)]
-                  sm:p-8
-                "
-              >
-                {/* Top accent */}
-                <div className="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-[#b76b43] via-[#d09270] to-transparent" />
+          {offers.length ? (
+            <div className="grid gap-6 lg:grid-cols-3">
+              {offers.map((offer, index) => {
+                const href = `/offers/${offer.slug}`;
+                const discount = offerDiscountLabel(offer);
+                const discounted = hasOfferDiscount(offer);
+                const price = formatInr(offer.finalPrice);
 
-                {/* Number + offer badge */}
-                <div className="flex items-center justify-between">
-                  <span
+                return (
+                  <article
+                    key={offer._id}
                     className="
+                      group
+                      relative
                       flex
-                      h-10
-                      w-10
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-[#faf8f4]
-                      text-[10px]
-                      font-semibold
-                      tracking-[0.12em]
-                      text-[#1b1917]/50
-                    "
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-
-                  <span
-                    className="
-                      inline-flex
-                      items-center
-                      gap-1.5
-                      rounded-full
+                      flex-col
+                      overflow-hidden
+                      rounded-[28px]
                       border
-                      border-[#b76b43]/20
-                      bg-[#b76b43]/[0.06]
-                      px-3
-                      py-1.5
-                      text-[9px]
-                      font-bold
-                      uppercase
-                      tracking-[0.16em]
-                      text-[#a35b36]
+                      border-[#e7dfd6]
+                      bg-white
+                      shadow-[0_12px_40px_rgba(27,25,23,0.05)]
+                      transition-all
+                      duration-500
+                      hover:-translate-y-1
+                      hover:border-[#b76b43]/30
+                      hover:shadow-[0_25px_60px_rgba(27,25,23,0.10)]
                     "
                   >
-                    <Sparkles size={11} />
-                    Offer
-                  </span>
-                </div>
+                    {/* Top accent */}
+                    <div className="absolute left-0 right-0 top-0 z-10 h-1 bg-gradient-to-r from-[#b76b43] via-[#d09270] to-transparent" />
 
-                {/* Title */}
-                <h2
-                  className="
-                    mt-7
-                    font-serif
-                    text-3xl
-                    leading-tight
-                    text-[#1b1917]
-                    transition-colors
-                    duration-300
-                    group-hover:text-[#b76b43]
-                  "
-                >
-                  {offer[0]}
-                </h2>
+                    {offer.image ? (
+                      <Link href={href} className="relative block aspect-[16/10] overflow-hidden bg-[#e9e1d8]">
+                        <Image
+                          src={offer.image}
+                          alt={offer.title}
+                          fill
+                          sizes="(max-width: 1023px) 100vw, 33vw"
+                          className="object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105"
+                        />
+                        {discount ? (
+                          <span className="absolute bottom-4 left-4 rounded-full bg-[#b76b43] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white shadow-lg">
+                            {discount}
+                          </span>
+                        ) : null}
+                      </Link>
+                    ) : null}
 
-                {/* Details */}
-                <div className="mt-6 space-y-3 border-y border-[#ebe4dc] py-5">
-                  <div className="flex items-start gap-3">
-                    <CalendarDays
-                      size={16}
-                      strokeWidth={1.6}
-                      className="mt-0.5 shrink-0 text-[#b76b43]"
-                    />
+                    <div className="flex flex-1 flex-col p-7 sm:p-8">
+                      {/* Number + offer badge */}
+                      <div className="flex items-center justify-between">
+                        <span
+                          className="
+                            flex
+                            h-10
+                            w-10
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-[#faf8f4]
+                            text-[10px]
+                            font-semibold
+                            tracking-[0.12em]
+                            text-[#1b1917]/50
+                          "
+                        >
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
 
-                    <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/35">
-                        Duration
-                      </p>
+                        <span
+                          className="
+                            inline-flex
+                            items-center
+                            gap-1.5
+                            rounded-full
+                            border
+                            border-[#b76b43]/20
+                            bg-[#b76b43]/[0.06]
+                            px-3
+                            py-1.5
+                            text-[9px]
+                            font-bold
+                            uppercase
+                            tracking-[0.16em]
+                            text-[#a35b36]
+                          "
+                        >
+                          {offer.featured ? <Star size={11} /> : <Sparkles size={11} />}
+                          {offer.featured ? "Featured" : !offer.image && discount ? discount : "Offer"}
+                        </span>
+                      </div>
 
-                      <p className="mt-1 text-sm text-[#514a44]">
-                        {offer[1]}
-                      </p>
+                      {/* Title */}
+                      <h2
+                        className="
+                          mt-7
+                          font-serif
+                          text-3xl
+                          leading-tight
+                          text-[#1b1917]
+                          transition-colors
+                          duration-300
+                          group-hover:text-[#b76b43]
+                        "
+                      >
+                        <Link href={href}>{offer.title}</Link>
+                      </h2>
+
+                      {offer.subtitle ? (
+                        <p className="mt-2 text-sm leading-6 text-[#1b1917]/55">{offer.subtitle}</p>
+                      ) : null}
+
+                      {/* Details */}
+                      <div className="mt-6 space-y-3 border-y border-[#ebe4dc] py-5">
+                        {offer.duration ? (
+                          <OfferDetail icon={CalendarDays} label="Duration" value={offer.duration} />
+                        ) : null}
+
+                        {offer.destinations?.length ? (
+                          <OfferDetail icon={MapPin} label="Destinations" value={offer.destinations.join(" · ")} />
+                        ) : null}
+
+                        <OfferDetail icon={Clock3} label="Validity" value={offerValidityLabel(offer)} />
+                      </div>
+
+                      {/* Price */}
+                      <div className="mt-7">
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/35">
+                          {price ? "Starting from" : "Pricing"}
+                        </p>
+
+                        <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                          <p className="font-serif text-3xl text-[#1b1917]">{price || "On request"}</p>
+                          {discounted ? (
+                            <p className="text-sm text-[#1b1917]/40 line-through">{formatInr(offer.originalPrice)}</p>
+                          ) : null}
+                        </div>
+
+                        <p className="mt-1 text-[11px] text-[#1b1917]/40">Indicative pricing</p>
+                      </div>
+
+                      {/* CTA */}
+                      <div className="mt-auto pt-7">
+                        <Link
+                          href={href}
+                          className="
+                            inline-flex
+                            w-full
+                            items-center
+                            justify-center
+                            gap-2
+                            rounded-full
+                            bg-[#b76b43]
+                            px-5
+                            py-3.5
+                            text-[10px]
+                            font-bold
+                            uppercase
+                            tracking-[0.15em]
+                            text-white
+                            transition-all
+                            duration-300
+                            hover:bg-[#934f30]
+                            hover:shadow-[0_12px_30px_rgba(183,107,67,0.20)]
+                          "
+                        >
+                          View offer
+                          <ArrowUpRight
+                            size={14}
+                            strokeWidth={1.8}
+                            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                          />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <MapPin
-                      size={16}
-                      strokeWidth={1.6}
-                      className="mt-0.5 shrink-0 text-[#b76b43]"
-                    />
-
-                    <div>
-                      <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/35">
-                        Destinations
-                      </p>
-
-                      <p className="mt-1 text-sm leading-6 text-[#514a44]">
-                        {offer[2]}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Price */}
-                <div className="mt-7">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/35">
-                    Starting from
-                  </p>
-
-                  <p className="mt-1 font-serif text-3xl text-[#1b1917]">
-                    {offer[3]}
-                  </p>
-
-                  <p className="mt-1 text-[11px] text-[#1b1917]/40">
-                    Indicative pricing
-                  </p>
-                </div>
-
-                {/* CTA */}
-                <Link
-                  href="/plan-your-trip"
-                  className="
-                    mt-7
-                    inline-flex
-                    w-full
-                    items-center
-                    justify-center
-                    gap-2
-                    rounded-full
-                    bg-[#b76b43]
-                    px-5
-                    py-3.5
-                    text-[10px]
-                    font-bold
-                    uppercase
-                    tracking-[0.15em]
-                    text-white
-                    transition-all
-                    duration-300
-                    hover:bg-[#b76b43]
-                    hover:shadow-[0_12px_30px_rgba(183,107,67,0.20)]
-                  "
-                >
-                  Ask for dates
-                  <ArrowUpRight
-                    size={14}
-                    strokeWidth={1.8}
-                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </Link>
-              </article>
-            ))}
-          </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mx-auto max-w-xl rounded-[28px] border border-dashed border-[#e7dfd6] bg-[#faf8f4] px-6 py-16 text-center">
+              <Sparkles className="mx-auto text-[#b76b43]" size={22} />
+              <h2 className="mt-4 font-serif text-3xl text-[#1b1917]">New offers are on the way.</h2>
+              <p className="mt-3 text-sm leading-7 text-[#1b1917]/55">
+                There are no live offers right now. Tell us your dates and we will shape a journey around your budget.
+              </p>
+            </div>
+          )}
         </Container>
       </section>
 
@@ -289,5 +299,29 @@ export default function Offers() {
         </Container>
       </section>
     </main>
+  );
+}
+
+function OfferDetail({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof MapPin;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <Icon size={16} strokeWidth={1.6} className="mt-0.5 shrink-0 text-[#b76b43]" />
+
+      <div>
+        <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/35">{label}</p>
+
+        <p className="mt-1 text-sm leading-6 text-[#514a44]">
+          {value}
+        </p>
+      </div>
+    </div>
   );
 }

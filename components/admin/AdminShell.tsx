@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
+  BadgePercent,
   BarChart3,
   BookOpen,
   CalendarDays,
@@ -54,6 +55,7 @@ const groups: NavGroup[] = [
       ['Experiences', '/admin/experiences', Sparkles],
       ['Events', '/admin/events', CalendarDays],
       ['Stories', '/admin/stories', BookOpen],
+      ['Offers', '/admin/offers', BadgePercent],
       ['Banners', '/admin/banners', ImageIcon],
       ['FAQs', '/admin/faqs', FileText],
       ['Testimonials', '/admin/testimonials', MessageSquareQuote],

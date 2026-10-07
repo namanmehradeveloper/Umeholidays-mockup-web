@@ -18,6 +18,8 @@ const nav = [
   { label: "Destinations", href: "/destinations" },
   { label: "Experiences", href: "/experiences" },
   { label: "Stories", href: "/stories" },
+  { label: "City Events", href: "/events" },
+
   { label: "About", href: "/about" },
   { label: "Contact Us", href: "/contact" },
 ];

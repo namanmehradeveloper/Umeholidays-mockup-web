@@ -7,6 +7,7 @@ export { default as Story } from './Story.js';
 export { default as Enquiry } from './Enquiry.js';
 export { default as Booking } from './Booking.js';
 export { default as Wishlist } from './Wishlist.js';
+export { default as Offer } from './Offer.js';
 
 export { default as AdminRecord } from './AdminRecord.js';
 

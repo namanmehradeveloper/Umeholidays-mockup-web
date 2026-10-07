@@ -14,7 +14,8 @@
     "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/index.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/home.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/search.js",
     "seed:home": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/home.js",
     "seed:search": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/search.js",
-    "seed:planner": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/planner.js"
+    "seed:planner": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/planner.js",
+    "seed:offers": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/seed-offers.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

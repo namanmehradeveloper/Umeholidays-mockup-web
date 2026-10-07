@@ -14,6 +14,7 @@ import auditLogRoutes from './auditLogRoutes.js';
 import settingsRoutes from './settingsRoutes.js';
 import uploadRoutes from './uploadRoutes.js';
 import plannerRoutes from './plannerRoutes.js';
+import offerRoutes from './offerRoutes.js';
 
 const router = Router();
 
@@ -28,6 +29,7 @@ router.use('/tours', tourRoutes);
 router.use('/experiences', experienceRoutes);
 router.use('/events', eventRoutes);
 router.use('/stories', storyRoutes);
+router.use('/offers', offerRoutes);
 router.use('/enquiries', enquiryRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/wishlist', wishlistRoutes);
