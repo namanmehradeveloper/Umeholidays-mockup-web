@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   ArrowUpRight,
   Instagram,
@@ -23,17 +25,41 @@ const companyLinks = [
   ['Contact', '/contact'],
   ['Offers', '/offers'],
   ['Events', '/events'],
-  ['Stories ', '/stories'],
 ];
 
+const accountLinks = [
+  ['My Account', '/account'],
+  ['My Bookings', '/account/bookings'],
+  ['Enquiries', '/account/enquiries'],
+  ['Saved Journeys', '/account/wishlist'],
+  ['Profile Settings', '/account/profile'],
+  ['Change Password', '/account/password'],
+];
+
+const guestLinks = [
+  ['Login', '/auth/login'],
+  ['Create account', '/auth/register'],
+  ['My Bookings', '/account/bookings'],
+  ['Saved Journeys', '/account/wishlist'],
+];
 
 export default function Footer() {
   const site = useSiteSettings();
+  const pathname = usePathname();
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  // Login/logout in the same tab do not fire `storage`, so re-check on navigation too.
+  useEffect(() => {
+    const sync = () => setLoggedIn(Boolean(localStorage.getItem('ume_token')));
+    sync();
+    window.addEventListener('storage', sync);
+    return () => window.removeEventListener('storage', sync);
+  }, [pathname]);
 
   return (
     <footer className="border-t border-white/10 bg-[#0b0b0b] text-white">
       <Container className="py-14 sm:py-16 lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-[1.6fr_repeat(3,1fr)] lg:gap-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_repeat(4,1fr)] lg:gap-12">
           {/* BRAND */}
 
           <div>
@@ -102,6 +128,11 @@ export default function Footer() {
           <FooterColumn
             title="Company"
             links={companyLinks}
+          />
+
+          <FooterColumn
+            title="My Account"
+            links={loggedIn ? accountLinks : guestLinks}
           />
 
           {/* CONTACT */}

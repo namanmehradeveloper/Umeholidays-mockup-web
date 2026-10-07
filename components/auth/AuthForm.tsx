@@ -95,21 +95,18 @@ function Field({
   id,
   label,
   icon: Icon,
-  action,
   children,
 }: {
   id: string;
   label: string;
   icon: LucideIcon;
-  action?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div>
-      <div className="mb-2 flex items-center justify-between text-xs font-semibold text-[#4f4943]">
-        <label htmlFor={id}>{label}</label>
-        {action}
-      </div>
+      <label htmlFor={id} className="mb-2 block text-xs font-semibold text-[#4f4943]">
+        {label}
+      </label>
       <div className="relative">
         <Icon size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#a39a91]" />
         {children}
@@ -265,18 +262,7 @@ export default function AuthForm({
         />
       </Field>
 
-      <Field
-        id="auth-password"
-        label="Password"
-        icon={Lock}
-        action={
-          mode === 'login' && (
-            <Link href="/auth/forgot-password" className="font-semibold text-[#a35b36] hover:text-[#7f4327]">
-              Forgot password?
-            </Link>
-          )
-        }
-      >
+      <Field id="auth-password" label="Password" icon={Lock}>
         <input
           id="auth-password"
           required
