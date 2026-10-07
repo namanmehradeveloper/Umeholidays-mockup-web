@@ -13,6 +13,8 @@ export const CMS_MODULES = [
   'search-sections',
   'search-categories',
   'search-popular',
+  'travel-essentials-sections',
+  'travel-essentials-services',
 ];
 
 /** One `home-sections` record per key; `data.key` identifies the home page section it configures. */
@@ -36,10 +38,14 @@ export const HOME_SECTION_KEYS = [
 /** One `search-sections` record per key; `results` holds the search box and result labels. */
 export const SEARCH_SECTION_KEYS = ['hero', 'results', 'categories', 'cta'];
 
+/** One `travel-essentials-sections` record per key; `services` lists `travel-essentials-services` records. */
+export const TRAVEL_ESSENTIALS_SECTION_KEYS = ['hero', 'services'];
+
 /** Section modules whose records are keyed by `data.key` (one record per key). */
 export const SECTION_MODULE_KEYS = {
   'home-sections': HOME_SECTION_KEYS,
   'search-sections': SEARCH_SECTION_KEYS,
+  'travel-essentials-sections': TRAVEL_ESSENTIALS_SECTION_KEYS,
 };
 
 const schema = new mongoose.Schema({

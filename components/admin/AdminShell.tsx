@@ -10,6 +10,7 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
+  Car,
   ClipboardList,
   Compass,
   FileText,
@@ -50,6 +51,7 @@ const groups: NavGroup[] = [
     items: [
       ['Homepage', '/admin/website/homepage', LayoutTemplate],
       ['Search Page', '/admin/website/search', SearchIcon],
+      ['Travel Essentials', '/admin/website/travel-essentials', Car],
       ['Destinations', '/admin/destinations', MapPinned],
       ['Tours', '/admin/tours', Compass],
       ['Experiences', '/admin/experiences', Sparkles],

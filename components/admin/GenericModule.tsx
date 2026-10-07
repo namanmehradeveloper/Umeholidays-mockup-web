@@ -53,7 +53,8 @@ type ModuleName =
   | 'map-locations'
   | 'trip-planner-steps'
   | 'search-categories'
-  | 'search-popular';
+  | 'search-popular'
+  | 'travel-essentials-services';
 
 type ContentSource = 'destinations' | 'tours' | 'experiences';
 
@@ -411,6 +412,21 @@ const configs: Record<ModuleName, Config> = {
       },
     ],
     sample: { term: '' },
+  },
+  'travel-essentials-services': {
+    title: 'Travel Essentials Services',
+    singular: 'Service',
+    titleKey: 'title',
+    image: true,
+    imageLabel: 'Service Image',
+    validate: (data) => (data.image ? undefined : 'Service image is required'),
+    fields: [
+      { key: 'eyebrow', label: 'Eyebrow', placeholder: 'Money Matters', icon: Sparkles },
+      { key: 'title', label: 'Title', required: true, placeholder: 'Currency Exchange', icon: Type },
+      { key: 'description', label: 'Description', type: 'textarea', rich: false, icon: FileText },
+      { key: 'features', label: 'Features', type: 'list', placeholder: 'Major currencies accepted', icon: List },
+    ],
+    sample: { eyebrow: '', title: '', description: '', features: [], image: '' },
   },
 };
 

@@ -11,9 +11,10 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
-    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/index.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/home.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/search.js",
+    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/index.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/home.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/search.js && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/travel-essentials.js",
     "seed:home": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/home.js",
     "seed:search": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/search.js",
+    "seed:travel-essentials": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/travel-essentials.js",
     "seed:planner": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/planner.js",
     "seed:offers": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON src/seed/seed-offers.js"
   },
