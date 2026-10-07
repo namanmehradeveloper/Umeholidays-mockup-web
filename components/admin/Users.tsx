@@ -250,6 +250,7 @@ export default function Users() {
   const [items, setItems] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -400,14 +401,16 @@ export default function Users() {
     );
 
     setCreateError('');
-    setCreating(true);
+    setCreateOpen(true);
   };
 
   const closeCreate = () => {
     if (creating) {
-      setCreating(false);
-      setCreateError('');
+      return;
     }
+
+    setCreateOpen(false);
+    setCreateError('');
   };
 
   const toggleActive = async (
@@ -532,6 +535,7 @@ export default function Users() {
 
       setCreateError('');
       setCreating(false);
+      setCreateOpen(false);
 
       pushToast(
         'success',
@@ -1279,7 +1283,7 @@ export default function Users() {
           CREATE USER MODAL
       ========================================================= */}
 
-      {creating && (
+      {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-[2px]">
           <div
             role="dialog"
@@ -1327,6 +1331,7 @@ export default function Users() {
 
             {/* Form */}
             <form
+              id="create-user-form"
               onSubmit={create}
               className="grid gap-5 p-6"
             >
