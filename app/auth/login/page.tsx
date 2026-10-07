@@ -1,1 +1,30 @@
-import AuthForm from '../../../components/auth/AuthForm';export default function Page(){return <main className="min-h-screen bg-white px-5 pb-20 pt-36"><div className="mx-auto max-w-md mb-8"><p className="text-[10px] uppercase tracking-[.25em] text-[#a35b36]">UME Holidays</p><h1 className="mt-2 font-serif text-5xl">Welcome back</h1></div><AuthForm mode="login"/></main>}
+import type { Metadata } from 'next';
+import { CalendarCheck, Heart, MessageSquareText } from 'lucide-react';
+
+import AuthForm from '../../../components/auth/AuthForm';
+import AuthLayout from '../../../components/auth/AuthLayout';
+
+export const metadata: Metadata = {
+  title: 'Sign in',
+};
+
+const perks = [
+  { label: 'Track your bookings', icon: CalendarCheck },
+  { label: 'Save journeys to your wishlist', icon: Heart },
+  { label: 'Follow up on trip enquiries', icon: MessageSquareText },
+];
+
+export default function Page() {
+  return (
+    <AuthLayout
+      title="Welcome back"
+      description="Sign in to manage your bookings, wishlist and enquiries."
+      image="https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80"
+      imageAlt="Amer Fort, Jaipur"
+      panelTitle="Your Rajasthan journeys, all in one place."
+      perks={perks}
+    >
+      <AuthForm mode="login" className="w-full" />
+    </AuthLayout>
+  );
+}
