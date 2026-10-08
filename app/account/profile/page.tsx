@@ -1,23 +1,31 @@
 'use client';
 
-import { FormEvent, ReactNode, useEffect, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   AlertCircle,
-  ArrowLeft,
   ArrowUpRight,
   CalendarDays,
+  CalendarRange,
   Check,
   CheckCircle2,
   ChevronRight,
+  Circle,
   Clock3,
   Copy,
+  Heart,
   History,
   KeyRound,
+  LayoutDashboard,
   Loader2,
   Lock,
+  LogOut,
+  Luggage,
   Mail,
+  MessageSquareText,
   Phone,
+  RotateCcw,
   Save,
   ShieldCheck,
   User,
@@ -115,6 +123,8 @@ function formatRole(role?: string) {
 ========================================================= */
 
 export default function Page() {
+  const router = useRouter();
+
   const [user, setUser] = useState<UserProfile | null>(null);
 
   const [form, setForm] = useState<ProfileForm>({
@@ -127,6 +137,7 @@ export default function Page() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const [copied, setCopied] = useState<'email' | null>(null);
 
@@ -181,6 +192,37 @@ export default function Page() {
   }, []);
 
   /* =======================================================
+     DERIVED
+  ======================================================= */
+
+  const isDirty = useMemo(() => {
+    if (!user) {
+      return false;
+    }
+
+    return (
+      form.name.trim() !== (user.name || '') ||
+      form.phone !== phoneDigits(user.phone || '')
+    );
+  }, [form, user]);
+
+  const completion = useMemo(() => {
+    const checks = [
+      { label: 'Full name', done: Boolean(user?.name) },
+      { label: 'Email address', done: Boolean(user?.email) },
+      { label: 'Phone / WhatsApp', done: Boolean(user?.phone) },
+      { label: 'Profile photo', done: Boolean(user?.avatar) },
+    ];
+
+    const done = checks.filter((item) => item.done).length;
+
+    return {
+      checks,
+      percent: Math.round((done / checks.length) * 100),
+    };
+  }, [user]);
+
+  /* =======================================================
      SAVE PROFILE
   ======================================================= */
 
@@ -229,6 +271,37 @@ export default function Page() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const resetForm = () => {
+    if (!user) {
+      return;
+    }
+
+    setForm({
+      name: user.name || '',
+      phone: phoneDigits(user.phone || ''),
+    });
+    setMessage('');
+    setError('');
+  };
+
+  /* =======================================================
+     LOGOUT
+  ======================================================= */
+
+  const logout = async () => {
+    setLoggingOut(true);
+
+    try {
+      await apiFetch('/auth/logout', { method: 'POST' });
+    } catch {
+      // Local logout should still complete when the API is unavailable.
+    }
+
+    localStorage.removeItem('ume_token');
+    localStorage.removeItem('ume_user');
+    router.replace('/auth/login');
   };
 
   /* =======================================================
@@ -299,6 +372,8 @@ export default function Page() {
     );
   }
 
+  const isOrganizer = user.role === 'organizer';
+
   /* =======================================================
      PAGE
   ======================================================= */
@@ -309,244 +384,308 @@ export default function Page() {
           HEADER
       ================================================= */}
 
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[#8a837c]">
-        <Link
-          href="/account"
-          className="inline-flex items-center gap-1.5 transition-colors hover:text-[#a35b36]"
-        >
-          <ArrowLeft size={14} strokeWidth={1.8} />
-          My account
-        </Link>
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="font-serif text-4xl tracking-[-0.03em] text-[#1b1917] sm:text-5xl">
+            My profile
+          </h1>
+        </div>
 
-        <ChevronRight size={12} className="text-[#c9c1b9]" />
-
-        <span aria-current="page" className="font-medium text-[#1b1917]">
-          Profile
-        </span>
-      </nav>
-
-      <header className="mt-6 max-w-2xl">
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a35b36]">
-          Your UME
-        </p>
-
-        <h1 className="mt-3 font-serif text-4xl tracking-[-0.03em] text-[#1b1917] sm:text-5xl">
-          Profile settings
-        </h1>
-
-        <p className="mt-3 text-sm leading-7 text-[#746d67]">
-          Manage your personal information and review your account details.
+        <p className="max-w-sm text-sm leading-6 text-[#746d67] sm:text-right">
+          Keep your details up to date so our travel designers can reach you.
         </p>
       </header>
 
       {/* =================================================
-          IDENTITY CARD
+          LAYOUT
       ================================================= */}
 
-      <section className="mt-8 overflow-hidden rounded-[28px] border border-[#ece7e2] bg-white shadow-[0_12px_40px_rgba(27,25,23,0.05)] sm:mt-10">
-        <div className="relative h-28 overflow-hidden bg-gradient-to-br from-[#f7f1e7] via-[#f2e2d4] to-[#e6c3aa] sm:h-36">
-          <div className="pointer-events-none absolute -right-12 -top-20 h-64 w-64 rounded-full bg-white/35 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-[#b76b43]/10 blur-3xl" />
-
-          <p className="absolute right-5 top-4 font-serif text-sm italic text-[#a35b36]/60 sm:right-8 sm:top-5">
-            UME Holidays
-          </p>
-        </div>
-
-        <div className="relative px-5 pb-6 sm:px-8 sm:pb-8">
-          <div className="-mt-14 flex flex-col items-center gap-4 text-center sm:-mt-16 sm:flex-row sm:items-start sm:gap-6 sm:text-left">
-            <Avatar user={user} />
-
-            <div className="min-w-0 flex-1 sm:mt-[76px]">
-              <h2 className="break-words font-serif text-2xl font-medium tracking-[-0.02em] text-[#1b1917] sm:text-3xl">
-                {user.name}
-              </h2>
-
-              <p className="mt-1 break-all text-sm text-[#746d67]">{user.email}</p>
-
-              <div className="mt-3 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#faf5f1] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a35b36]">
-                  <ShieldCheck size={13} strokeWidth={1.8} />
-                  {formatRole(user.role)}
-                </span>
-
-                <StatusPill active={user.isActive} />
-              </div>
-            </div>
-          </div>
-
-          <dl className="mt-7 grid grid-cols-1 gap-3 border-t border-[#f0ebe6] pt-6 sm:grid-cols-3 sm:gap-4">
-            <Stat icon={CalendarDays} label="Member since" value={formatDate(user.createdAt)} />
-            <Stat icon={Clock3} label="Last login" value={formatDateTime(user.lastLoginAt)} />
-            <Stat icon={History} label="Last updated" value={formatDateTime(user.updatedAt)} />
-          </dl>
-        </div>
-      </section>
-
-      {/* =================================================
-          CONTENT GRID
-      ================================================= */}
-
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        {/* ===============================================
-            PERSONAL INFORMATION
-        =============================================== */}
-
-        <section className="overflow-hidden rounded-[28px] border border-[#ece7e2] bg-white shadow-[0_12px_40px_rgba(27,25,23,0.04)]">
-          <CardHeader
-            icon={User}
-            title="Personal information"
-            description="Update the contact details we use for your bookings and enquiries."
-          />
-
-          <form onSubmit={save} className="px-5 py-6 sm:px-8 sm:py-8">
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-              <Field label="Full name" icon={User} htmlFor="profile-name" required>
-                <input
-                  id="profile-name"
-                  required
-                  minLength={2}
-                  maxLength={80}
-                  autoComplete="name"
-                  value={form.name}
-                  onChange={(event) =>
-                    setForm((previous) => ({
-                      ...previous,
-                      name: event.target.value,
-                    }))
-                  }
-                  placeholder="Enter your full name"
-                  className={inputClass}
-                />
-              </Field>
-
-              <Field label="Phone / WhatsApp" icon={Phone} htmlFor="profile-phone">
-                <input
-                  id="profile-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete="tel-national"
-                  pattern="[6-9][0-9]{9}"
-                  title={PHONE_ERROR}
-                  value={form.phone}
-                  onChange={(event) =>
-                    setForm((previous) => ({
-                      ...previous,
-                      phone: phoneDigits(event.target.value),
-                    }))
-                  }
-                  placeholder="10-digit mobile number"
-                  className={inputClass}
-                />
-              </Field>
-
-              <div className="md:col-span-2">
-                <Field
-                  label="Email address"
-                  icon={Mail}
-                  htmlFor="profile-email"
-                  hint="Your email is used to sign in and can't be changed here."
-                >
-                  <input
-                    id="profile-email"
-                    readOnly
-                    value={user.email || ''}
-                    className={`${inputClass} cursor-default border-[#efeae5] bg-[#faf8f6] pr-24 text-[#6f6862] hover:border-[#efeae5] focus:ring-0`}
-                  />
-
-                  <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
-                    <Lock size={13} className="mr-1 text-[#b9b1a9]" aria-hidden />
-
-                    <button
-                      type="button"
-                      onClick={() => copyValue('email', user.email)}
-                      title="Copy email"
-                      aria-label="Copy email"
-                      className="grid h-9 w-9 place-items-center rounded-lg text-[#8a837c] transition-colors hover:bg-white hover:text-[#b76b43]"
-                    >
-                      {copied === 'email' ? (
-                        <Check size={15} className="text-emerald-600" />
-                      ) : (
-                        <Copy size={14} />
-                      )}
-                    </button>
-                  </div>
-                </Field>
-              </div>
-            </div>
-
-            {/* Alerts */}
-
-            <div aria-live="polite">
-              {message && (
-                <div className="mt-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  <CheckCircle2 size={17} className="mt-0.5 shrink-0" />
-                  {message}
-                </div>
-              )}
-
-              {error && (
-                <div className="mt-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                  <AlertCircle size={17} className="mt-0.5 shrink-0" />
-                  {error}
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-
-            <div className="mt-8 flex flex-col-reverse gap-4 border-t border-[#f0ebe6] pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs leading-5 text-[#9a928b]">
-                Fields marked <span className="text-[#b76b43]">*</span> are required.
-              </p>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className={`${primaryButtonClass} w-full sm:w-auto`}
-              >
-                {saving ? (
-                  <>
-                    <Loader2 size={15} className="animate-spin" />
-                    Saving…
-                  </>
-                ) : (
-                  <>
-                    <Save size={15} />
-                    Save changes
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </section>
-
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
         {/* ===============================================
             SIDEBAR
         =============================================== */}
 
-        <aside className="space-y-6">
-          <Link
-            href="/account/password"
-            className="group flex items-start gap-4 rounded-[24px] border border-[#ece7e2] bg-[#faf6f2] p-5 transition-all hover:-translate-y-0.5 hover:border-[#b76b43]/30 hover:bg-white hover:shadow-[0_16px_38px_rgba(27,25,23,0.07)] sm:p-6"
+        <aside className="space-y-5 lg:sticky lg:top-28">
+          {/* Identity */}
+
+          <section className="overflow-hidden rounded-[26px] border border-[#ece7e2] bg-white shadow-[0_12px_40px_rgba(27,25,23,0.05)]">
+            <div className="relative overflow-hidden bg-[#1b1917] px-6 pb-7 pt-8 text-center text-white">
+              <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#b76b43]/40 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-[#d98a61]/20 blur-3xl" />
+
+              <div className="relative">
+                <Avatar user={user} />
+
+                <h2 className="mt-4 break-words font-serif text-2xl tracking-[-0.02em]">
+                  {user.name}
+                </h2>
+
+                <p className="mt-1 break-all text-xs text-white/55">{user.email}</p>
+
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#e8b08f]">
+                    <ShieldCheck size={12} strokeWidth={1.8} />
+                    {formatRole(user.role)}
+                  </span>
+
+                  <StatusPill active={user.isActive} />
+                </div>
+              </div>
+            </div>
+
+            {/* Completion */}
+
+            <div className="border-b border-[#f0ebe6] px-6 py-5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#4a443f]">Profile completion</span>
+                <span className="font-serif text-base text-[#b76b43]">{completion.percent}%</span>
+              </div>
+
+              <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[#f3eee9]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#d98a61] to-[#b76b43] transition-all duration-500"
+                  style={{ width: `${completion.percent}%` }}
+                />
+              </div>
+
+              <ul className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2">
+                {completion.checks.map((item) => (
+                  <li
+                    key={item.label}
+                    className={`flex items-center gap-1.5 text-[11px] ${
+                      item.done ? 'text-[#4a443f]' : 'text-[#aaa29b]'
+                    }`}
+                  >
+                    {item.done ? (
+                      <CheckCircle2 size={13} className="shrink-0 text-emerald-600" />
+                    ) : (
+                      <Circle size={13} className="shrink-0 text-[#d6cec7]" />
+                    )}
+                    {item.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Meta */}
+
+            <dl className="space-y-3.5 px-6 py-5">
+              <MetaRow icon={CalendarDays} label="Member since" value={formatDate(user.createdAt)} />
+              <MetaRow icon={Clock3} label="Last login" value={formatDateTime(user.lastLoginAt)} />
+              <MetaRow icon={History} label="Last updated" value={formatDateTime(user.updatedAt)} />
+            </dl>
+          </section>
+
+          {/* Navigation */}
+
+          <nav
+            aria-label="Account"
+            className="rounded-[26px] border border-[#ece7e2] bg-white p-2.5 shadow-[0_12px_40px_rgba(27,25,23,0.04)]"
           >
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-[#b76b43] transition group-hover:bg-[#b76b43] group-hover:text-white">
-              <KeyRound size={18} strokeWidth={1.7} />
-            </span>
+            <NavItem href="/account" icon={LayoutDashboard} label="Overview" />
+            <NavItem href="/account/profile" icon={User} label="Profile" active />
+            <NavItem href="/account/bookings" icon={Luggage} label="My bookings" />
+            <NavItem href="/account/enquiries" icon={MessageSquareText} label="Enquiries" />
+            <NavItem href="/account/wishlist" icon={Heart} label="Saved journeys" />
+            {isOrganizer && <NavItem href="/account/events" icon={CalendarRange} label="My events" />}
+            <NavItem href="/account/password" icon={KeyRound} label="Password & security" />
 
-            <span className="min-w-0 flex-1">
-              <span className="block font-serif text-xl text-[#1b1917]">Password & security</span>
-              <span className="mt-1 block text-sm leading-6 text-[#746d67]">
-                Update the password used to sign in to your account.
-              </span>
-            </span>
+            <div className="mx-3 my-2 border-t border-[#f0ebe6]" />
 
-            <ArrowUpRight
-              size={17}
-              className="mt-1 shrink-0 text-[#b76b43] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-          </Link>
+            <button
+              type="button"
+              onClick={logout}
+              disabled={loggingOut}
+              className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-medium text-[#c0392b] transition-colors hover:bg-red-50 disabled:opacity-50"
+            >
+              <LogOut size={16} strokeWidth={1.7} />
+              {loggingOut ? 'Logging out…' : 'Logout'}
+            </button>
+          </nav>
         </aside>
+
+        {/* ===============================================
+            MAIN
+        =============================================== */}
+
+        <div className="space-y-6">
+          {/* Personal information */}
+
+          <section className="overflow-hidden rounded-[26px] border border-[#ece7e2] bg-white shadow-[0_12px_40px_rgba(27,25,23,0.04)]">
+            <CardHeader
+              icon={User}
+              title="Personal information"
+              description="Update the contact details we use for your bookings and enquiries."
+            />
+
+            <form onSubmit={save} className="px-5 py-6 sm:px-8 sm:py-8">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
+                <Field label="Full name" icon={User} htmlFor="profile-name" required>
+                  <input
+                    id="profile-name"
+                    required
+                    minLength={2}
+                    maxLength={80}
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={(event) =>
+                      setForm((previous) => ({
+                        ...previous,
+                        name: event.target.value,
+                      }))
+                    }
+                    placeholder="Enter your full name"
+                    className={inputClass}
+                  />
+                </Field>
+
+                <Field
+                  label="Phone / WhatsApp"
+                  icon={Phone}
+                  htmlFor="profile-phone"
+                  hint="We'll use this for trip updates on WhatsApp."
+                >
+                  <input
+                    id="profile-phone"
+                    type="tel"
+                    inputMode="numeric"
+                    autoComplete="tel-national"
+                    pattern="[6-9][0-9]{9}"
+                    title={PHONE_ERROR}
+                    value={form.phone}
+                    onChange={(event) =>
+                      setForm((previous) => ({
+                        ...previous,
+                        phone: phoneDigits(event.target.value),
+                      }))
+                    }
+                    placeholder="10-digit mobile number"
+                    className={inputClass}
+                  />
+                </Field>
+
+                <div className="md:col-span-2">
+                  <Field
+                    label="Email address"
+                    icon={Mail}
+                    htmlFor="profile-email"
+                    hint="Your email is used to sign in and can't be changed here."
+                  >
+                    <input
+                      id="profile-email"
+                      readOnly
+                      value={user.email || ''}
+                      className={`${inputClass} cursor-default border-[#efeae5] bg-[#faf8f6] pr-24 text-[#6f6862] hover:border-[#efeae5] focus:ring-0`}
+                    />
+
+                    <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+                      <Lock size={13} className="mr-1 text-[#b9b1a9]" aria-hidden />
+
+                      <button
+                        type="button"
+                        onClick={() => copyValue('email', user.email)}
+                        title="Copy email"
+                        aria-label="Copy email"
+                        className="grid h-9 w-9 place-items-center rounded-lg text-[#8a837c] transition-colors hover:bg-white hover:text-[#b76b43]"
+                      >
+                        {copied === 'email' ? (
+                          <Check size={15} className="text-emerald-600" />
+                        ) : (
+                          <Copy size={14} />
+                        )}
+                      </button>
+                    </div>
+                  </Field>
+                </div>
+              </div>
+
+              {/* Alerts */}
+
+              <div aria-live="polite">
+                {message && (
+                  <div className="mt-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    <CheckCircle2 size={17} className="mt-0.5 shrink-0" />
+                    {message}
+                  </div>
+                )}
+
+                {error && (
+                  <div className="mt-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                    <AlertCircle size={17} className="mt-0.5 shrink-0" />
+                    {error}
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+
+              <div className="mt-8 flex flex-col-reverse gap-4 border-t border-[#f0ebe6] pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-xs leading-5 text-[#9a928b]">
+                  {isDirty ? (
+                    <span className="inline-flex items-center gap-1.5 text-[#a35b36]">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#b76b43]" />
+                      You have unsaved changes
+                    </span>
+                  ) : (
+                    <>
+                      Fields marked <span className="text-[#b76b43]">*</span> are required.
+                    </>
+                  )}
+                </p>
+
+                <div className="flex flex-col-reverse gap-3 sm:flex-row">
+                  {isDirty && (
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      disabled={saving}
+                      className={`${secondaryButtonClass} w-full sm:w-auto`}
+                    >
+                      <RotateCcw size={14} />
+                      Discard
+                    </button>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={saving || !isDirty}
+                    className={`${primaryButtonClass} w-full sm:w-auto`}
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" />
+                        Saving…
+                      </>
+                    ) : (
+                      <>
+                        <Save size={15} />
+                        Save changes
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </section>
+
+          {/* Quick links */}
+
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <QuickLink
+              href="/account/password"
+              icon={KeyRound}
+              title="Password & security"
+              description="Change the password you use to sign in."
+            />
+
+            <QuickLink
+              href="/account/bookings"
+              icon={Luggage}
+              title="My bookings"
+              description="View trip details, dates and booking status."
+            />
+          </section>
+        </div>
       </div>
     </PageShell>
   );
@@ -558,7 +697,7 @@ export default function Page() {
 
 function PageShell({ children }: { children: ReactNode }) {
   return (
-    <main className="min-h-screen bg-white px-4 pb-20 pt-28 text-[#1b1917] sm:px-6 sm:pt-32 lg:px-8 lg:pt-36">
+    <main className="min-h-screen bg-[#faf8f5] px-4 pb-20 pt-28 text-[#1b1917] sm:px-6 sm:pt-32 lg:px-8">
       <div className="mx-auto max-w-6xl">{children}</div>
     </main>
   );
@@ -568,27 +707,19 @@ function CardHeader({
   icon: Icon,
   title,
   description,
-  compact,
 }: {
   icon: IconType;
   title: string;
   description: string;
-  compact?: boolean;
 }) {
   return (
-    <div
-      className={`flex items-start gap-4 border-b border-[#f0ebe6] ${
-        compact ? 'px-5 py-5 sm:px-6' : 'px-5 py-5 sm:px-8 sm:py-6'
-      }`}
-    >
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#faf6f2] text-[#b76b43]">
+    <div className="flex items-start gap-4 border-b border-[#f0ebe6] px-5 py-5 sm:px-8 sm:py-6">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#faf1ea] text-[#b76b43]">
         <Icon size={18} strokeWidth={1.7} />
       </span>
 
       <div className="min-w-0">
-        <h2 className={`font-serif font-medium text-[#1b1917] ${compact ? 'text-xl' : 'text-2xl'}`}>
-          {title}
-        </h2>
+        <h2 className="font-serif text-2xl font-medium text-[#1b1917]">{title}</h2>
 
         <p className="mt-1 text-xs leading-5 text-[#8a837c] sm:text-[13px]">{description}</p>
       </div>
@@ -602,22 +733,22 @@ function CardHeader({
 
 function Avatar({ user }: { user: UserProfile }) {
   return (
-    <div className="relative h-28 w-28 shrink-0 sm:h-32 sm:w-32">
+    <div className="relative mx-auto h-24 w-24">
       {user.avatar ? (
         <img
           src={user.avatar}
           alt={user.name}
-          className="h-full w-full rounded-full border-[5px] border-white object-cover shadow-[0_14px_34px_rgba(27,25,23,0.16)]"
+          className="h-full w-full rounded-full object-cover ring-4 ring-white/10"
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center rounded-full border-[5px] border-white bg-[#f7efe9] font-serif text-4xl text-[#b76b43] shadow-[0_14px_34px_rgba(27,25,23,0.12)]">
+        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#d98a61] to-[#9d5735] font-serif text-3xl text-white ring-4 ring-white/10">
           {getInitials(user.name)}
         </div>
       )}
 
       <span
         title={user.isActive ? 'Active account' : 'Inactive account'}
-        className={`absolute bottom-2 right-2 h-5 w-5 rounded-full border-[3px] border-white sm:bottom-2.5 sm:right-2.5 ${
+        className={`absolute bottom-1 right-1 h-4 w-4 rounded-full border-[3px] border-[#1b1917] ${
           user.isActive ? 'bg-emerald-500' : 'bg-red-500'
         }`}
       />
@@ -634,28 +765,94 @@ function StatusPill({ active }: { active: boolean }) {
     <span
       className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] ${
         active
-          ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-          : 'border-red-200 bg-red-50 text-red-700'
+          ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300'
+          : 'border-red-400/30 bg-red-400/10 text-red-300'
       }`}
     >
-      <span className={`h-1.5 w-1.5 rounded-full ${active ? 'bg-emerald-500' : 'bg-red-500'}`} />
-      {active ? 'Active account' : 'Inactive account'}
+      <span className={`h-1.5 w-1.5 rounded-full ${active ? 'bg-emerald-400' : 'bg-red-400'}`} />
+      {active ? 'Active' : 'Inactive'}
     </span>
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: IconType; label: string; value: string }) {
+function MetaRow({ icon: Icon, label, value }: { icon: IconType; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-[#faf8f6] px-4 py-3.5">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[#b76b43] shadow-[0_2px_8px_rgba(27,25,23,0.04)]">
-        <Icon size={16} strokeWidth={1.7} />
+    <div className="flex items-center gap-3">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#faf6f2] text-[#b76b43]">
+        <Icon size={15} strokeWidth={1.7} />
       </span>
 
       <div className="min-w-0">
         <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#9a928b]">{label}</dt>
-        <dd className="mt-0.5 truncate text-sm font-medium text-[#3f3a36]">{value}</dd>
+        <dd className="mt-0.5 truncate text-[13px] font-medium text-[#3f3a36]">{value}</dd>
       </div>
     </div>
+  );
+}
+
+function NavItem({
+  href,
+  icon: Icon,
+  label,
+  active,
+}: {
+  href: string;
+  icon: IconType;
+  label: string;
+  active?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={`group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-medium transition-colors ${
+        active
+          ? 'bg-[#faf1ea] text-[#9d5735]'
+          : 'text-[#4a443f] hover:bg-[#faf8f6] hover:text-[#9d5735]'
+      }`}
+    >
+      <Icon size={16} strokeWidth={1.7} className={active ? 'text-[#b76b43]' : 'text-[#a59d96]'} />
+      <span className="flex-1">{label}</span>
+      <ChevronRight
+        size={14}
+        className={`transition-transform group-hover:translate-x-0.5 ${
+          active ? 'text-[#b76b43]' : 'text-[#d0c8c1]'
+        }`}
+      />
+    </Link>
+  );
+}
+
+function QuickLink({
+  href,
+  icon: Icon,
+  title,
+  description,
+}: {
+  href: string;
+  icon: IconType;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex items-start gap-4 rounded-[22px] border border-[#ece7e2] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-[#b76b43]/30 hover:shadow-[0_16px_38px_rgba(27,25,23,0.07)]"
+    >
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#faf1ea] text-[#b76b43] transition group-hover:bg-[#b76b43] group-hover:text-white">
+        <Icon size={18} strokeWidth={1.7} />
+      </span>
+
+      <span className="min-w-0 flex-1">
+        <span className="block font-serif text-lg text-[#1b1917]">{title}</span>
+        <span className="mt-1 block text-[13px] leading-5 text-[#746d67]">{description}</span>
+      </span>
+
+      <ArrowUpRight
+        size={17}
+        className="mt-1 shrink-0 text-[#b76b43] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+      />
+    </Link>
   );
 }
 
@@ -706,31 +903,32 @@ function Field({
 function ProfileSkeleton() {
   return (
     <div className="animate-pulse" aria-busy="true" aria-label="Loading profile">
-      <div className="h-3 w-40 rounded-full bg-[#f1ece7]" />
-      <div className="mt-8 h-3 w-24 rounded-full bg-[#f1ece7]" />
-      <div className="mt-4 h-10 w-64 max-w-full rounded-xl bg-[#f1ece7]" />
+      <div className="h-10 w-64 max-w-full rounded-xl bg-[#efe9e3]" />
 
-      <div className="mt-10 overflow-hidden rounded-[28px] border border-[#ece7e2]">
-        <div className="h-28 bg-[#f7f1e7] sm:h-36" />
-        <div className="relative px-5 pb-8 sm:px-8">
-          <div className="-mt-14 flex flex-col items-center gap-4 sm:-mt-16 sm:flex-row sm:items-start sm:gap-6">
-            <div className="h-28 w-28 rounded-full border-[5px] border-white bg-[#efe7e0] sm:h-32 sm:w-32" />
-            <div className="space-y-3 sm:mt-[76px]">
-              <div className="h-6 w-48 rounded-lg bg-[#f1ece7]" />
-              <div className="h-3 w-36 rounded-full bg-[#f1ece7]" />
+      <div className="mt-8 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="space-y-5">
+          <div className="overflow-hidden rounded-[26px] border border-[#ece7e2] bg-white">
+            <div className="flex flex-col items-center bg-[#2a2622] px-6 pb-7 pt-8">
+              <div className="h-24 w-24 rounded-full bg-white/10" />
+              <div className="mt-4 h-5 w-36 rounded-lg bg-white/10" />
+              <div className="mt-2 h-3 w-44 rounded-full bg-white/10" />
+            </div>
+            <div className="space-y-3 px-6 py-6">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="h-9 rounded-xl bg-[#faf6f2]" />
+              ))}
             </div>
           </div>
-          <div className="mt-7 grid gap-3 sm:grid-cols-3">
-            {[0, 1, 2].map((item) => (
-              <div key={item} className="h-[68px] rounded-2xl bg-[#faf8f6]" />
-            ))}
+          <div className="h-[300px] rounded-[26px] border border-[#ece7e2] bg-white" />
+        </div>
+
+        <div className="space-y-6">
+          <div className="h-[440px] rounded-[26px] border border-[#ece7e2] bg-white" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="h-[104px] rounded-[22px] border border-[#ece7e2] bg-white" />
+            <div className="h-[104px] rounded-[22px] border border-[#ece7e2] bg-white" />
           </div>
         </div>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="h-[420px] rounded-[28px] border border-[#ece7e2] bg-white" />
-        <div className="h-[300px] rounded-[28px] border border-[#ece7e2] bg-white" />
       </div>
 
       <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[#9a928b]">

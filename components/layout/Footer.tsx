@@ -29,6 +29,7 @@ const companyLinks = [
 
 const accountLinks = [
   ['My Account', '/account'],
+  ['My Profile', '/account/profile'],
   ['My Bookings', '/account/bookings'],
   ['Enquiries', '/account/enquiries'],
   ['Saved Journeys', '/account/wishlist'],
@@ -37,6 +38,7 @@ const accountLinks = [
 const guestLinks = [
   ['Login', '/auth/login'],
   ['Create account', '/auth/register'],
+  ['My Profile', '/account/profile'],
   ['My Bookings', '/account/bookings'],
   ['Saved Journeys', '/account/wishlist'],
 ];
