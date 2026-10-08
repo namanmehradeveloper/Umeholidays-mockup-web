@@ -219,10 +219,7 @@ export default async function Stories() {
               </h2>
             </div>
 
-            <p className="max-w-sm text-sm leading-6 text-[#1b1917]/45">
-              Places worth knowing, experiences worth remembering and stories
-              that make you want to pack your bags.
-            </p>
+           
           </div>
 
           {/* Story Grid */}
