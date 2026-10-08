@@ -34,47 +34,152 @@ async function buildEnquiryData(req) {
 
 const formatAmount = (amount, currency) => `${currency || 'INR'} ${Number(amount || 0).toLocaleString('en-IN')}`;
 
-function enquiryNotification(enquiry) {
-  const planner = enquiry.planner;
-  const rows = [
-    ['Name', enquiry.name],
-    ['Email', enquiry.email],
-    ['Phone', enquiry.phone],
-    ['Source', enquiry.source],
-    ['Destination', enquiry.destination || 'Custom'],
-    ['Travel dates', enquiry.travelDates],
-    ['Travellers', enquiry.travellers],
-    ['Related page', enquiry.relatedSlug],
-    ...(planner
-      ? [
-          ['Duration', planner.snapshot?.duration?.label],
-          ['Estimate', formatAmount(planner.estimatedAmount, planner.currency)],
-        ]
-      : []),
-  ].filter(([, value]) => value !== undefined && value !== null && value !== '');
+const NOT_SPECIFIED = 'Not specified';
+const REPLY_NOTE = 'Reply to this email to respond to the customer directly.';
 
-  const message = enquiry.message || '';
+const hasValue = (value) => value !== undefined && value !== null && String(value).trim() !== '';
+
+const formatSource = (source) =>
+  String(source || 'other')
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+
+/** Trip-planner answers live in `preferences`; plan-your-trip details are resolved server-side into `planner`. */
+function enquiryDetails(enquiry) {
+  const preferences = enquiry.preferences && typeof enquiry.preferences === 'object' ? enquiry.preferences : {};
+  const planner = enquiry.planner;
+  const pick = (...values) => values.find(hasValue);
+
+  return {
+    travelStyle: pick(preferences.style, preferences.travelStyle, planner?.snapshot?.travelStyle?.name),
+    duration: pick(preferences.duration, planner?.snapshot?.duration?.label),
+    budget: pick(
+      preferences.budget,
+      planner ? `${formatAmount(planner.estimatedAmount, planner.currency)} (estimated)` : undefined,
+    ),
+  };
+}
+
+function enquiryNotification(enquiry) {
+  const { travelStyle, duration, budget } = enquiryDetails(enquiry);
+  const email = enquiry.email || '';
+  const phone = enquiry.phone || '';
+
+  const rows = [
+    { label: 'Name', value: enquiry.name },
+    { label: 'Email', value: email, href: email ? `mailto:${email}` : undefined },
+    { label: 'Phone', value: phone, href: phone ? `tel:+91${phone}` : undefined },
+    { label: 'Source', value: formatSource(enquiry.source) },
+    { label: 'Destination', value: enquiry.destination || 'Custom' },
+    { label: 'Travel Style', value: travelStyle },
+    { label: 'Duration', value: duration },
+    { label: 'Budget', value: budget },
+    ...[
+      { label: 'Travel Dates', value: enquiry.travelDates },
+      { label: 'Travellers', value: enquiry.travellers },
+      { label: 'Related Page', value: enquiry.relatedSlug },
+    ].filter((row) => hasValue(row.value)),
+  ];
+
+  const message = (enquiry.message || '').trim();
+  const year = new Date().getFullYear();
+
   const text = [
-    `New ${enquiry.source} enquiry received.`,
+    `New ${formatSource(enquiry.source)} enquiry - UME Holidays`,
     '',
-    ...rows.map(([label, value]) => `${label}: ${value}`),
-    ...(message ? ['', 'Message:', message] : []),
+    ...rows.map((row) => `${row.label}: ${hasValue(row.value) ? row.value : NOT_SPECIFIED}`),
     '',
-    'Reply to this email to respond to the customer directly.',
+    'Message:',
+    message || 'No message provided.',
+    '',
+    REPLY_NOTE,
+    '',
+    '--',
+    'UME Holidays',
+    'Thoughtful journeys across Rajasthan',
+    env.appUrl,
   ].join('\n');
 
-  const html = `
-    <p>New <strong>${escapeHtml(enquiry.source)}</strong> enquiry received.</p>
-    <table cellpadding="6" style="border-collapse:collapse">
-      ${rows
-        .map(
-          ([label, value]) =>
-            `<tr><td style="color:#746d67;vertical-align:top">${escapeHtml(label)}</td><td>${escapeHtml(value)}</td></tr>`,
-        )
-        .join('')}
+  const cell = 'padding:12px 16px;border-bottom:1px solid #f0ebe6;font-size:14px;line-height:20px;vertical-align:top;';
+  const link = 'color:#b76b43;text-decoration:none;';
+
+  const tableRows = rows
+    .map(({ label, value, href }, index) => {
+      const background = index % 2 === 0 ? '#ffffff' : '#fbf9f7';
+      let content = `<span style="color:#a39b94;">${NOT_SPECIFIED}</span>`;
+      if (hasValue(value)) {
+        content = href
+          ? `<a href="${escapeHtml(href)}" style="${link}">${escapeHtml(value)}</a>`
+          : escapeHtml(value);
+      }
+
+      return `<tr>
+              <td width="34%" style="${cell}background:${background};color:#746d67;font-weight:600;white-space:nowrap;">${escapeHtml(label)}</td>
+              <td style="${cell}background:${background};color:#1b1917;">${content}</td>
+            </tr>`;
+    })
+    .join('');
+
+  const messageHtml = message
+    ? escapeHtml(message).replace(/\r?\n/g, '<br>')
+    : '<span style="color:#a39b94;">No message provided.</span>';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>New UME Holidays enquiry</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f6f2ee;font-family:Arial,Helvetica,sans-serif;color:#1b1917;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f6f2ee;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #ece7e2;border-radius:12px;overflow:hidden;">
+            <tr>
+              <td style="background:#1b1917;padding:24px 28px;">
+                <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:28px;color:#ffffff;">UME Holidays</p>
+                <p style="margin:6px 0 0;font-size:11px;line-height:16px;letter-spacing:2px;text-transform:uppercase;color:#e8b08f;">New ${escapeHtml(formatSource(enquiry.source))} enquiry</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 28px 8px;">
+                <p style="margin:0;font-size:15px;line-height:22px;color:#3f3a36;">You have received a new enquiry from <strong>${escapeHtml(enquiry.name)}</strong>.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 28px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #ece7e2;border-collapse:separate;border-radius:8px;overflow:hidden;">
+                  ${tableRows}
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 28px 16px;">
+                <p style="margin:0 0 8px;font-size:11px;line-height:16px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#b76b43;">Message</p>
+                <div style="background:#faf6f2;border-left:3px solid #b76b43;border-radius:6px;padding:14px 16px;font-size:14px;line-height:22px;color:#3f3a36;">${messageHtml}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 28px 28px;">
+                <p style="margin:0;padding:12px 16px;background:#fff8f3;border:1px solid #f1dfd2;border-radius:6px;font-size:13px;line-height:20px;color:#9d5735;">${REPLY_NOTE}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="background:#faf8f5;border-top:1px solid #ece7e2;padding:20px 28px;text-align:center;">
+                <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:16px;line-height:22px;color:#1b1917;">UME Holidays</p>
+                <p style="margin:4px 0 0;font-size:12px;line-height:18px;color:#8a837c;">Thoughtful journeys across Rajasthan</p>
+                <p style="margin:8px 0 0;font-size:12px;line-height:18px;"><a href="${escapeHtml(env.appUrl)}" style="${link}">${escapeHtml(env.appUrl.replace(/^https?:\/\//, ''))}</a></p>
+                <p style="margin:8px 0 0;font-size:11px;line-height:16px;color:#a39b94;">&copy; ${year} UME Holidays. This notification was sent from your website enquiry form.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
     </table>
-    ${message ? `<p><strong>Message</strong></p><p style="white-space:pre-line">${escapeHtml(message)}</p>` : ''}
-    <p style="color:#746d67">Reply to this email to respond to the customer directly.</p>`;
+  </body>
+</html>`;
 
   return { text, html };
 }
