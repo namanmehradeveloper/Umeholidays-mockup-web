@@ -860,14 +860,14 @@ export function DetailsDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 lg:p-6"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6"
       role="presentation"
     >
       <button
         type="button"
         aria-label="Close details"
         onClick={onClose}
-        className="absolute inset-0 h-full w-full cursor-default bg-[#0F172A]/60 backdrop-blur-[4px]"
+        className="absolute inset-0 h-full w-full cursor-default bg-[#0F172A]/50 backdrop-blur-[2px]"
       />
 
       <section
@@ -877,151 +877,93 @@ export function DetailsDialog({
         aria-modal="true"
         aria-labelledby="details-dialog-title"
         aria-describedby={subtitle ? 'details-dialog-subtitle' : undefined}
-        className="relative z-10 flex max-h-[94vh] w-full max-w-[1380px] flex-col overflow-hidden rounded-[22px] border border-white/70 bg-[#F8FAFC] shadow-[0_30px_100px_rgba(15,23,42,0.35)] animate-[adminModalIn_250ms_cubic-bezier(0.22,1,0.36,1)] sm:max-h-[92vh] sm:rounded-[26px]"
+        className="relative z-10 flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.25)] animate-[adminModalIn_200ms_cubic-bezier(0.22,1,0.36,1)]"
       >
-        <header className="relative z-30 shrink-0 border-b border-[#E2E8F0] bg-white/95 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 lg:px-8">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2.5 flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fff8f3] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#b76b43]">
-                  <Eye aria-hidden strokeWidth={2} className="h-3.5 w-3.5" />
-                  Full Details
-                </span>
-
-                <span className="hidden text-xs font-medium text-[#94A3B8] sm:inline">
-                  Complete record information
-                </span>
-              </div>
-
-              <h2
-                id="details-dialog-title"
-                title={title}
-                className="break-words text-xl font-semibold tracking-tight text-[#0F172A] sm:text-2xl lg:text-[28px]"
-              >
-                {title}
-              </h2>
-
-              {subtitle && (
-                <p
-                  id="details-dialog-subtitle"
-                  className="mt-1.5 max-w-4xl break-words text-sm leading-6 text-[#64748B] sm:text-[15px]"
-                >
-                  {subtitle}
-                </p>
-              )}
-            </div>
-
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={onClose}
-              aria-label="Close full details"
-              title="Close"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white text-[#64748B] ring-1 ring-inset ring-[#E2E8F0] transition-all duration-200 hover:bg-[#F1F5F9] hover:text-[#0F172A] hover:ring-[#CBD5E1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b76b43]/30 sm:h-11 sm:w-11"
+        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-[#E2E8F0] px-5 py-4 sm:px-6">
+          <div className="min-w-0">
+            <h2
+              id="details-dialog-title"
+              title={title}
+              className="break-words text-lg font-semibold text-[#0F172A]"
             >
-              <X aria-hidden strokeWidth={1.8} className="h-5 w-5" />
-            </button>
+              {title}
+            </h2>
+
+            {subtitle && (
+              <p
+                id="details-dialog-subtitle"
+                className="mt-0.5 break-words text-sm text-[#64748B]"
+              >
+                {subtitle}
+              </p>
+            )}
           </div>
+
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close full details"
+            title="Close"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-[#64748B] transition-colors hover:bg-[#F1F5F9] hover:text-[#0F172A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b76b43]/30"
+          >
+            <X aria-hidden strokeWidth={1.8} className="h-5 w-5" />
+          </button>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-4 sm:px-5 sm:py-5 lg:px-7 lg:py-7">
-          <div className="mx-auto w-full max-w-[1280px] space-y-5">
-            <section className="overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_4px_24px_rgba(15,23,42,0.04)] sm:rounded-3xl">
-              <div className="bg-gradient-to-br from-[#F8FAFC] via-white to-[#fff8f3] px-5 py-6 sm:px-7 sm:py-7 lg:px-8">
-                <div className="mb-4 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-[#b76b43]" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#64748B]">
-                    Record Overview
-                  </span>
-                </div>
+        <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+          {rows.length === 0 ? (
+            <p className="px-6 py-12 text-center text-sm text-[#94A3B8]">
+              No details available
+            </p>
+          ) : (
+            <dl className="divide-y divide-[#F1F5F9]">
+              {rows.map(([label, value], index) => {
+                const empty = isEmptyValue(value);
+                const stacked = isFullWidthField(label, value);
 
-                <h3 className="break-words text-2xl font-semibold tracking-tight text-[#0F172A] sm:text-3xl lg:text-[34px]">
-                  {title}
-                </h3>
-
-                {subtitle && (
-                  <p className="mt-2 max-w-5xl break-words text-sm leading-7 text-[#64748B] sm:text-base">
-                    {subtitle}
-                  </p>
-                )}
-              </div>
-            </section>
-
-            {rows.length === 0 ? (
-              <section className="rounded-2xl border border-dashed border-[#CBD5E1] bg-white px-6 py-16 text-center sm:rounded-3xl">
-                <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-[#F1F5F9] text-[#64748B]">
-                  <Eye aria-hidden strokeWidth={1.7} className="h-6 w-6" />
-                </div>
-                <p className="text-sm font-semibold text-[#334155]">No details available</p>
-                <p className="mt-1 text-xs text-[#94A3B8]">There is no additional data to display.</p>
-              </section>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-5">
-                {rows.map(([label, value], index) => {
-                  const empty = isEmptyValue(value);
-                  const fullWidth = isFullWidthField(label, value);
-
-                  return (
-                    <section
-                      key={`${label}-${index}`}
-                      className={`min-w-0 overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_4px_18px_rgba(15,23,42,0.035)] transition-all duration-200 hover:border-[#D5DDE8] hover:shadow-[0_6px_24px_rgba(15,23,42,0.055)] ${
-                        fullWidth ? 'md:col-span-2' : ''
-                      }`}
-                    >
-                      <div className="border-b border-[#EEF2F6] bg-[#FBFCFE] px-5 py-3.5 sm:px-6">
-                        <h4 className="break-words text-[10px] font-bold uppercase tracking-[0.15em] text-[#64748B]">
-                          {label}
-                        </h4>
-                      </div>
-
-                      <div className="min-w-0 px-5 py-5 sm:px-6">
-                        {empty ? (
-                          <span className="text-sm italic text-[#94A3B8]">Not available</span>
-                        ) : (
-                          <div className="min-w-0 max-w-full break-words text-[14px] leading-7 text-[#1E293B] sm:text-[15px] [&_*]:max-w-full [&_a]:break-all [&_a]:font-medium [&_a]:text-[#b76b43] [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-[#0F172A] [&_b]:font-semibold [&_b]:text-[#0F172A] [&_p]:mb-3 [&_p]:leading-7 [&_p:last-child]:mb-0 [&_h1]:mb-3 [&_h1]:mt-5 [&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-[#0F172A] [&_h2]:mb-3 [&_h2]:mt-5 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-[#0F172A] [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-[#0F172A] [&_ul]:my-3 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6 [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:pl-6 [&_li]:pl-1 [&_blockquote]:my-4 [&_blockquote]:rounded-r-xl [&_blockquote]:border-l-4 [&_blockquote]:border-[#d9ad93] [&_blockquote]:bg-[#F8FAFC] [&_blockquote]:px-4 [&_blockquote]:py-3 [&_blockquote]:text-[#475569] [&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-2xl [&_img]:border [&_img]:border-[#E2E8F0] [&_img]:object-contain [&_video]:my-4 [&_video]:h-auto [&_video]:max-w-full [&_video]:rounded-xl [&_iframe]:my-4 [&_iframe]:max-w-full [&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-[#E2E8F0] [&_th]:bg-[#F8FAFC] [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold [&_td]:border [&_td]:border-[#E2E8F0] [&_td]:px-3 [&_td]:py-2 [&_pre]:my-3 [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:bg-[#0F172A] [&_pre]:p-4 [&_pre]:text-sm [&_pre]:text-white [&_code]:break-words">
-                            {value}
-                          </div>
-                        )}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-            )}
-
-            <section className="overflow-hidden rounded-2xl border border-[#eadfd5] bg-[#fff9f5] px-5 py-5 text-[#1b1917] sm:rounded-3xl sm:px-7">
-              <div className="flex items-center justify-between gap-5">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#a35b36]">Full Record</p>
-                  <p className="mt-1 text-sm leading-6 text-[#6d655f]">Complete record information is shown above.</p>
-                </div>
-                <div className="hidden h-11 w-11 shrink-0 place-items-center rounded-xl border border-[#eadfd5] bg-white text-[#b76b43] sm:grid">
-                  <Eye aria-hidden strokeWidth={1.7} className="h-5 w-5" />
-                </div>
-              </div>
-            </section>
-          </div>
+                return (
+                  <div
+                    key={`${label}-${index}`}
+                    className={`px-5 py-3 sm:px-6 ${
+                      stacked
+                        ? 'space-y-1.5'
+                        : 'grid grid-cols-1 gap-1 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-4'
+                    }`}
+                  >
+                    <dt className="break-words text-sm text-[#64748B]">
+                      {label}
+                    </dt>
+                    <dd className="min-w-0 break-words text-sm font-medium leading-6 text-[#0F172A] [&_a]:break-all [&_a]:text-[#b76b43] [&_a]:underline [&_a]:underline-offset-2 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_p]:font-normal [&_h1]:mb-2 [&_h1]:mt-3 [&_h1]:text-base [&_h1]:font-semibold [&_h2]:mb-2 [&_h2]:mt-3 [&_h2]:text-base [&_h2]:font-semibold [&_h3]:mb-1 [&_h3]:mt-2 [&_h3]:font-semibold [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:my-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:font-normal [&_img]:my-2 [&_img]:h-auto [&_img]:max-h-56 [&_img]:max-w-full [&_img]:rounded-lg [&_img]:object-contain [&_video]:my-2 [&_video]:max-w-full [&_video]:rounded-lg [&_iframe]:max-w-full [&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-[#E2E8F0] [&_th]:bg-[#F8FAFC] [&_th]:px-2 [&_th]:py-1 [&_th]:text-left [&_td]:border [&_td]:border-[#E2E8F0] [&_td]:px-2 [&_td]:py-1 [&_td]:font-normal [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-[#0F172A] [&_pre]:p-3 [&_pre]:text-white">
+                      {empty ? (
+                        <span className="font-normal text-[#CBD5E1]">—</span>
+                      ) : (
+                        value
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
         </main>
 
-        <footer className="relative z-30 shrink-0 border-t border-[#E2E8F0] bg-white/95 px-4 py-3.5 backdrop-blur-xl sm:px-6 sm:py-4 lg:px-8">
-          <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4">
-            <p className="hidden items-center gap-1.5 text-xs text-[#94A3B8] sm:flex">
-              Press
-              <kbd className="inline-flex min-w-6 items-center justify-center rounded-md border border-[#CBD5E1] bg-[#F8FAFC] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B] shadow-sm">
-                Esc
-              </kbd>
-              to close
-            </p>
+        <footer className="flex shrink-0 items-center justify-between gap-4 border-t border-[#E2E8F0] px-5 py-3 sm:px-6">
+          <p className="hidden items-center gap-1.5 text-xs text-[#94A3B8] sm:flex">
+            Press
+            <kbd className="rounded border border-[#CBD5E1] bg-[#F8FAFC] px-1.5 py-0.5 text-[10px] font-semibold text-[#64748B]">
+              Esc
+            </kbd>
+            to close
+          </p>
 
-            <button
-              type="button"
-              onClick={onClose}
-              className="ml-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#b76b43] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#934f30] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b76b43]/30"
-            >
-              <X aria-hidden strokeWidth={1.8} className="h-4 w-4" />
-              Close
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="ml-auto rounded-lg bg-[#b76b43] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#934f30] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b76b43]/30"
+          >
+            Close
+          </button>
         </footer>
       </section>
     </div>

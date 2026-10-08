@@ -173,6 +173,21 @@ export default function Footer() {
               >
                 {site.phone}
               </a>
+
+              {site.address && (
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="
+                    block
+                    transition-colors
+                    hover:text-[#d98a61]
+                  "
+                >
+                  {site.address}
+                </a>
+              )}
             </div>
 
             {/* SOCIALS */}
