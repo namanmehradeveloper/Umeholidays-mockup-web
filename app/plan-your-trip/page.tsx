@@ -48,14 +48,13 @@ export default async function Plan() {
           ) : null}
 
           {/* Light editorial overlays */}
-          <div className="absolute inset-0 bg-white/65" />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 via-[55%] to-white/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#faf8f4] via-transparent to-white/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/25 via-[35%] to-transparent to-[60%]" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#faf8f4] to-transparent" />
         </div>
 
         <Container className="relative py-24 sm:py-28 lg:py-36">
           {page ? (
-            <div className="max-w-4xl">
+            <div className="max-w-4xl [text-shadow:0_0_18px_rgba(255,255,255,0.9),0_0_4px_rgba(255,255,255,0.8)]">
               {/* Eyebrow */}
               {page.heroEyebrow ? (
                 <div className="flex items-center gap-3">
@@ -85,20 +84,20 @@ export default async function Plan() {
                 {page.heroTitleMuted ? (
                   <>
                     <br />
-                    <span className="text-[#1b1917]/25">{page.heroTitleMuted}</span>
+                    <span className="text-[#1b1917]/55">{page.heroTitleMuted}</span>
                   </>
                 ) : null}
               </h1>
 
               {page.heroDescription ? (
-                <p className="mt-7 max-w-xl text-sm leading-7 text-[#1b1917]/60 sm:text-base">
+                <p className="mt-7 max-w-xl text-sm font-medium leading-7 text-[#1b1917]/85 sm:text-base">
                   {page.heroDescription}
                 </p>
               ) : null}
 
               {/* Trust line */}
               {page.trustPoints?.length ? (
-                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-[9px] font-medium uppercase tracking-[0.18em] text-[#1b1917]/45">
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1b1917]/75">
                   {page.trustPoints.map((point, index) =>
                     index === 0 ? (
                       <span key={point} className="flex items-center gap-2">
