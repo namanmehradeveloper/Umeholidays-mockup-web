@@ -42,16 +42,15 @@ const groups: NavGroup[] = [
     title: 'Overview', items: [
       ['Dashboard', '/admin/dashboard', LayoutDashboard],
       ['Users', '/admin/users', Users],
-      ['Bookings', '/admin/bookings', CalendarDays]
+      ['Bookings', '/admin/bookings', CalendarDays],
+      ['Contact & Enquiries', '/admin/leads', Users]
+
 
     ]
   },
   {
     title: 'Content',
     items: [
-      ['Homepage', '/admin/website/homepage', LayoutTemplate],
-      ['Search Page', '/admin/website/search', SearchIcon],
-      ['Travel Essentials', '/admin/website/travel-essentials', Car],
       ['Destinations', '/admin/destinations', MapPinned],
       ['Tours', '/admin/tours', Compass],
       ['Experiences', '/admin/experiences', Sparkles],
@@ -64,9 +63,15 @@ const groups: NavGroup[] = [
     ],
   },
   { title: 'Travel Planner', items: [['Travel Planner', '/admin/planner', Route]] },
-  { title: 'CRM', items: [['Contact & Enquiries', '/admin/leads', Users]] },
-  { title: 'Comming Soon', items: [
-  ] },
+  {
+    title: 'Pages & Content', items: [
+      ['Homepage', '/admin/website/homepage', LayoutTemplate],
+      ['Search Page', '/admin/website/search', SearchIcon],
+      ['Travel Essentials', '/admin/website/travel-essentials', Car],
+    ]
+  },
+
+
   {
     title: 'System',
     items: [
@@ -179,8 +184,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                       href={href}
                       onClick={() => setOpen(false)}
                       className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all ${isActive
-                          ? 'bg-[#1769ff] font-bold text-white shadow-[0_8px_20px_rgba(23,105,255,0.35)]'
-                          : 'font-semibold text-[#c3cfe2] hover:bg-white/[0.06] hover:text-white'
+                        ? 'bg-[#1769ff] font-bold text-white shadow-[0_8px_20px_rgba(23,105,255,0.35)]'
+                        : 'font-semibold text-[#c3cfe2] hover:bg-white/[0.06] hover:text-white'
                         }`}
                     >
                       <span className={isActive ? 'text-white' : 'text-[#7f93b3] transition-colors group-hover:text-[#8fb6ff]'}>

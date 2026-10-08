@@ -136,7 +136,6 @@ export default function Dashboard() {
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[.25em] text-[#64748B]">Overview</p>
           <h1 className="mt-2 font-serif text-4xl text-[#0F172A]">Dashboard & Analytics</h1>
-          <p className="mt-2 text-sm text-[#64748B]">Live metrics calculated from the existing MongoDB data.</p>
         </div>
         <button type="button" onClick={() => { void loadDashboard(); void loadAnalytics(); }} disabled={loading || analyticsLoading} className="inline-flex items-center gap-2 rounded-xl border border-[#E2E8F0] bg-white px-4 py-2.5 text-sm font-semibold text-[#334155] shadow-sm disabled:opacity-50">
           <RefreshCw className={`h-4 w-4 ${loading || analyticsLoading ? 'animate-spin' : ''}`} /> Refresh

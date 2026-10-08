@@ -14,11 +14,6 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <button type="button" aria-label="Notifications" className="relative rounded-xl p-2 text-[#625a54] transition hover:bg-[#faf7f4] hover:text-[#9c5735]">
-            <Bell size={18} strokeWidth={2} />
-            <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[#b76b43]" />
-          </button>
-
           <div className="flex items-center gap-3 border-l border-[#e8e2dc] pl-3">
             <div className="hidden text-right sm:block">
               <p className="text-sm font-bold text-[#1b1917]">{user?.name || 'Admin'}</p>
