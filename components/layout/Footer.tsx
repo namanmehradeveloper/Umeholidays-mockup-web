@@ -32,8 +32,6 @@ const accountLinks = [
   ['My Bookings', '/account/bookings'],
   ['Enquiries', '/account/enquiries'],
   ['Saved Journeys', '/account/wishlist'],
-  ['Profile Settings', '/account/profile'],
-  ['Change Password', '/account/password'],
 ];
 
 const guestLinks = [
@@ -58,11 +56,11 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-white/10 bg-[#0b0b0b] text-white">
-      <Container className="py-14 sm:py-16 lg:py-20">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.6fr_repeat(4,1fr)] lg:gap-12">
+      <Container className="py-10 sm:py-12 lg:py-14">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 lg:grid-cols-[1.4fr_repeat(3,1fr)_1.4fr] lg:gap-10">
           {/* BRAND */}
 
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <Link
               href="/"
               aria-label="UME Holidays home"
@@ -73,11 +71,11 @@ export default function Footer() {
                 alt="Umeholidays - Explore Rajasthan"
                 width={300}
                 height={240}
-                className="h-[82px] w-auto max-w-[215px] object-contain object-left"
+                className="h-[64px] w-auto max-w-[180px] object-contain object-left"
               />
             </Link>
 
-            <p className="mt-5 max-w-sm text-sm leading-7 text-white/60">
+            <p className="mt-4 max-w-sm text-sm leading-6 text-white/60">
               Thoughtful journeys across Rajasthan,
               designed around place, pace and people.
             </p>
@@ -86,7 +84,7 @@ export default function Footer() {
               href="/plan-your-trip"
               className="
                 group
-                mt-6
+                mt-5
                 inline-flex
                 items-center
                 gap-2
@@ -137,10 +135,10 @@ export default function Footer() {
 
           {/* CONTACT */}
 
-          <div>
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <h3
               className="
-                mb-5
+                mb-4
                 text-[10px]
                 font-semibold
                 uppercase
@@ -179,8 +177,9 @@ export default function Footer() {
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}`}
                   target="_blank"
                   rel="noreferrer"
+                  title={site.address}
                   className="
-                    block
+                    line-clamp-2
                     transition-colors
                     hover:text-[#d98a61]
                   "
@@ -192,7 +191,7 @@ export default function Footer() {
 
             {/* SOCIALS */}
 
-            <div className="mt-6 flex items-center gap-3">
+            <div className="mt-5 flex items-center gap-3">
               <a
                 href={site.instagram || '/contact'}
                 target={site.instagram ? '_blank' : undefined}
@@ -278,13 +277,13 @@ export default function Footer() {
 
         <div
           className="
-            mt-10
+            mt-8
             flex
             flex-col
-            gap-4
+            gap-3
             border-t
             border-white/10
-            pt-6
+            pt-5
             text-[10px]
             text-white/40
 
@@ -346,7 +345,7 @@ function FooterColumn({
     <div>
       <h3
         className="
-          mb-5
+          mb-4
           text-[10px]
           font-semibold
           uppercase
@@ -357,7 +356,7 @@ function FooterColumn({
         {title}
       </h3>
 
-      <div className="space-y-3.5">
+      <div className="space-y-2.5">
         {links.map(([label, href]) => (
           <Link
             key={href}
