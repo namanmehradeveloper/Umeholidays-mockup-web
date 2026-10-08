@@ -14,7 +14,15 @@ const required = (name) => {
   return value;
 };
 
+const optional = (name) => process.env[name]?.trim() || undefined;
+
+const toBoolean = (value, fallback) => {
+  if (value === undefined) return fallback;
+  return ['true', '1', 'yes'].includes(value.toLowerCase());
+};
+
 const nodeEnv = process.env.NODE_ENV || 'development';
+const smtpPort = Number(optional('SMTP_PORT')) || 465;
 
 const env = Object.freeze({
   nodeEnv,
@@ -34,8 +42,18 @@ const env = Object.freeze({
     password: process.env.ADMIN_PASSWORD,
   },
   email: {
-    resendApiKey: process.env.RESEND_API_KEY,
-    from: process.env.EMAIL_FROM,
+    from: optional('MAIL_FROM') || optional('EMAIL_FROM'),
+    /** Inbox that receives new-enquiry notifications. */
+    to: optional('MAIL_TO') || optional('ADMIN_EMAIL'),
+    smtp: {
+      host: optional('SMTP_HOST'),
+      port: smtpPort,
+      // Port 465 uses implicit TLS; 587 upgrades with STARTTLS, so secure must be false there.
+      secure: toBoolean(optional('SMTP_SECURE'), smtpPort === 465),
+      user: optional('SMTP_USER'),
+      password: process.env.SMTP_PASSWORD,
+    },
+    resendApiKey: optional('RESEND_API_KEY'),
   },
 });
 
