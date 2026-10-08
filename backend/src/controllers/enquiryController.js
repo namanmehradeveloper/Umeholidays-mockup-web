@@ -184,9 +184,7 @@ function enquiryNotification(enquiry) {
   return { text, html };
 }
 
-export async function createEnquiry(req, res) {
-  const enquiry = await Enquiry.create(await buildEnquiryData(req));
-  const planner = enquiry.planner;
+async function sendEnquiryEmails(enquiry) {
   const notification = enquiryNotification(enquiry);
 
   const [, adminResult] = await Promise.allSettled([
@@ -209,6 +207,17 @@ export async function createEnquiry(req, res) {
   if (emailConfigured && env.email.to && adminResult.status === 'fulfilled' && adminResult.value === false) {
     console.error(`[enquiry] saved enquiry ${enquiry.id} but the admin notification email was not sent`);
   }
+}
+
+export async function createEnquiry(req, res) {
+  const enquiry = await Enquiry.create(await buildEnquiryData(req));
+  const planner = enquiry.planner;
+
+  // SMTP can take longer than the browser's request timeout, so emails are sent
+  // after the response; sendEmail logs its own failures.
+  sendEnquiryEmails(enquiry).catch((error) =>
+    console.error(`[enquiry] notification emails failed for ${enquiry.id}:`, error?.message || error),
+  );
 
   return sendSuccess(res, {
     status: 201,
